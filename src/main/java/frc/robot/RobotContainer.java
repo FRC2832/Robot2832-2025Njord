@@ -126,6 +126,7 @@ public class RobotContainer {
         SmartDashboard.putData("Drive Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsDiamond()));
         */
         //SmartDashboard.putData("Test Leds", new TestLeds(leds));
+        SmartDashboard.putData("Fine Drive to Pose", swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
 
         // Register Named Commands for PathPlanner
         //NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));

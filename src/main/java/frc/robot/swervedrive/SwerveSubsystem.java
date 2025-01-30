@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -54,6 +55,7 @@ import org.livoniawarriors.UtilFunctions;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -109,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
+    setMotorBrake(true);
   }
   
 
@@ -762,4 +765,21 @@ public class SwerveSubsystem extends SubsystemBase
   public Command swerveLock(){
     return new SwerveLock(this);
   }
+
+  public Command finePosition(Pose2d targetPose) {
+    return this.driveToPose(targetPose)
+        .andThen(new FinePosition(this, targetPose));
+  }
+
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
+    var modules = swerveDrive.getModules();
+    for(var i=0; i<desiredStates.length; i++) {
+      modules[i].setDesiredState(desiredStates[i], isOpenLoop, true);
+    }
+  }
+
+  public SwerveModule[] getModules() {
+    return swerveDrive.getModules();
+  }
 }
+
