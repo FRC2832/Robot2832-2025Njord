@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.livoniawarriors.GitVersion;
+import org.livoniawarriors.motorcontrol.MotorControls;
 
 import com.pathplanner.lib.util.PPLibTelemetry;
 
@@ -91,6 +92,7 @@ public class Robot extends LoggedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        MotorControls.UpdateLogs();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
