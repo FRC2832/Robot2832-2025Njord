@@ -4,12 +4,13 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.livoniawarriors.GitVersion;
-import org.livoniawarriors.motorcontrol.MotorControls;
 
 import com.pathplanner.lib.util.PPLibTelemetry;
 
@@ -32,6 +33,7 @@ public class Robot extends LoggedRobot {
     private RobotContainer m_robotContainer;
     @SuppressWarnings("unused")
     private Logger logger;
+    ArrayList<Runnable> periodics;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -71,7 +73,8 @@ public class Robot extends LoggedRobot {
 
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
-        m_robotContainer = new RobotContainer();
+        periodics = new ArrayList<>();
+        m_robotContainer = new RobotContainer(this);
         m_robotContainer.configureBindings();
 
         //start logging class after all the subsystems have initialized
@@ -92,7 +95,9 @@ public class Robot extends LoggedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        MotorControls.UpdateLogs();
+        for (Runnable runnable : periodics) {
+            runnable.run();
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -157,4 +162,18 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically whilst in simulation. */
     @Override
     public void simulationPeriodic() {}
+
+    /**
+     * Adds a periodic function to our code.  AdvantageKit's Logged Robot does not supply this, so we
+     * made our own.  Note: The period and offset are ignored for now.
+     * @param callback Function to run
+     * @param periodSeconds Ignored, set to our looptime (20ms)
+     * @param offsetSeconds Ignored
+     * @return
+     */
+    public boolean addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+        periodics.add(callback);
+        return true;
+    }
+    
 }

@@ -10,6 +10,7 @@ import org.livoniawarriors.leds.LedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
 import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.leds.TestLeds;
+import org.livoniawarriors.motorcontrol.MotorControls;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -56,7 +57,7 @@ public class RobotContainer {
 
     private AprilTagCamera frontCamera;
 
-    public RobotContainer() {
+    public RobotContainer(Robot robot) {
         driverController = new XboxController(0);
 
         String swerveDirectory = "swerve/kitbot";
@@ -110,6 +111,9 @@ public class RobotContainer {
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        //periodic tasks to add
+        robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
     }
 
     /**

@@ -309,6 +309,7 @@ public class UtilFunctions {
         try {
             Field field = RobotBase.class.getDeclaredField("m_robotCopy");
             field.setAccessible(true);
+            @SuppressWarnings("resource")
             TimedRobot returnObject = (TimedRobot)field.get(RobotBase.class);
             returnObject.addPeriodic(callback, periodSeconds, offsetSeconds);
             return true;

@@ -23,7 +23,7 @@ public class LoopTimeLogger implements Runnable {
          * 
          * You don't get the time in updating SmartDashboard, LiveWindow, Shuffleboard, and Simulation
          */
-        UtilFunctions.addPeriodic(this, Robot.kDefaultPeriod, 0);
+        robot.addPeriodic(this, Robot.kDefaultPeriod, 0);
         this.table = table;
         try{
             //read the robot class for the watchdog
