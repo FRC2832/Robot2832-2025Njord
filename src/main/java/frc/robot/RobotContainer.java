@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.io.File;
 
+import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.LightningFlash;
 import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.leds.TestLeds;
@@ -51,10 +52,35 @@ public class RobotContainer {
     private Vision vision;
 
     private XboxController driverController;
-
     private SendableChooser<Command> autoChooser;
-
     private AprilTagCamera frontCamera;
+
+    private final String[] PDP_CHANNEL_NAMES = {
+        "Channel 0",
+        "Channel 1",
+        "Channel 2",
+        "Channel 3",
+        "Channel 4",
+        "Channel 5",
+        "Channel 6",
+        "Channel 7",
+        "Channel 8",
+        "Channel 9",
+        "Channel 10",
+        "Channel 11",
+        "Channel 12",
+        "Channel 13",
+        "Channel 14",
+        "Channel 15",
+        "Channel 16",
+        "Channel 17",
+        "Channel 18",
+        "Channel 19",
+        "Channel 20",
+        "Channel 21",
+        "Channel 22",
+        "Channel 23"
+    };
 
     public RobotContainer(Robot robot) {
         driverController = new XboxController(0);
@@ -113,6 +139,7 @@ public class RobotContainer {
 
         //periodic tasks to add
         robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
+        robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
     }
 
     /**
