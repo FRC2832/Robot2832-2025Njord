@@ -38,13 +38,13 @@ public class Robot extends LoggedRobot {
      */
     public Robot() {
         //start logging to WpiLog file
-        //DataLogManager.start();
+        DataLogManager.start();
 
         // Start AdvantageKit logger
-        //Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new NT4Publisher());
         //wpilog writer disable because it only logs the AdvantageKit table, not all signals
-        //Logger.addDataReceiver(new WPILOGWriter());
-        //Logger.start();
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.start();
     
         //display the Git info for the build in the network tables
         GitVersion.loadVersion().printVersions();
@@ -74,7 +74,7 @@ public class Robot extends LoggedRobot {
         m_robotContainer.configureBindings();
 
         //start logging class after all the subsystems have initialized
-        //Logger.start();
+        Logger.start();
     }
 
     /**
