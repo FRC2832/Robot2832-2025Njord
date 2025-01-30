@@ -65,6 +65,10 @@ public class TalonFXMotor extends MotorControl {
         this(motorName, new TalonFX(id, canbus), false);
     }
 
+    public TalonFXMotor(String motorName, int id, String canbus, boolean logOnly) {
+        this(motorName, new TalonFX(id, canbus), logOnly);
+    }
+
     public TalonFXMotor(String motorName, TalonFX motor, boolean logOnly) {
         super(motorName, logOnly, false);
         this.motor = motor;

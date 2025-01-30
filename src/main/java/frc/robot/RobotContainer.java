@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
-import frc.robot.ramp.RampSubsystem;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
@@ -47,7 +46,6 @@ import frc.robot.vision.Vision;
 public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     private SwerveSubsystem swerveDrive;
-    private RampSubsystem rampSubsystem;
     private FrontLeds frontLeds;
     private RearLeds rearLeds;
     private Vision vision;
@@ -66,7 +64,6 @@ public class RobotContainer {
         swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
         frontLeds = new FrontLeds(6, 54);
         rearLeds = new RearLeds(frontLeds);
-        rampSubsystem = new RampSubsystem();
         if(Robot.isSimulation()) {
             //drive fast in simulation
             swerveDrive.setMaximumSpeed(5, Math.PI);
@@ -149,7 +146,6 @@ public class RobotContainer {
         frontLeds.setDefaultCommand(new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
         rearLeds.setDefaultCommand(new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
         //rearLeds.setDefaultCommand(new TestLeds(rearLeds));
-        rampSubsystem.setDefaultCommand(rampSubsystem.runMotor(() -> (driverController.getRightTriggerAxis() * 0.35) - (driverController.getLeftTriggerAxis() * 0.35)));
     }
 
     /**
