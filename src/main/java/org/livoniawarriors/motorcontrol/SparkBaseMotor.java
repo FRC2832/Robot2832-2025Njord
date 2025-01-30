@@ -21,6 +21,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+//TODO fix status code checking
+@SuppressWarnings("unused")
 class SparkBaseMotor extends MotorControl {
     private SparkBase motor;
     private SparkBaseConfig cfg;

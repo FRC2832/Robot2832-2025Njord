@@ -28,6 +28,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
+//TODO fix status code checking
+@SuppressWarnings("unused")
 public class TalonFXMotor extends MotorControl {
     TalonFX motor;
     /** Current TalonFX configuration. */
