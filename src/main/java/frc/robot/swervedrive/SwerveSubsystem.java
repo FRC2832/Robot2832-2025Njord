@@ -762,6 +762,14 @@ public class SwerveSubsystem extends SubsystemBase
   Integer update = 0;
   StructPublisher<Pose2d> publisher;
 
+  public void stop() {
+    swerveDrive.drive(new ChassisSpeeds());
+  }
+
+  public Command pushPartner() {
+    return new PushPartner(this);
+  }
+  
   public Command swerveLock(){
     return new SwerveLock(this);
   }
