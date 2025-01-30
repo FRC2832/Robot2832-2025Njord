@@ -4,17 +4,8 @@
 
 package frc.robot;
 
-import java.io.File;
-
-import org.livoniawarriors.PdpLoggerKit;
-import org.livoniawarriors.leds.LightningFlash;
-import org.livoniawarriors.leds.RainbowLeds;
-import org.livoniawarriors.leds.TestLeds;
-import org.livoniawarriors.motorcontrol.MotorControls;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,6 +28,9 @@ import frc.robot.leds.ShowTargetInfo;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
+import java.io.File;
+import org.livoniawarriors.PdpLoggerKit;
+import org.livoniawarriors.motorcontrol.MotorControls;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,146 +39,155 @@ import frc.robot.vision.Vision;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    private SwerveSubsystem swerveDrive;
-    private FrontLeds frontLeds;
-    private RearLeds rearLeds;
-    private Vision vision;
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private SwerveSubsystem swerveDrive;
 
-    private XboxController driverController;
-    private SendableChooser<Command> autoChooser;
-    private AprilTagCamera frontCamera;
+  private FrontLeds frontLeds;
+  private RearLeds rearLeds;
+  private Vision vision;
 
-    private final String[] PDP_CHANNEL_NAMES = {
-        "Channel 0",
-        "Channel 1",
-        "Channel 2",
-        "Channel 3",
-        "Channel 4",
-        "Channel 5",
-        "Channel 6",
-        "Channel 7",
-        "Channel 8",
-        "Channel 9",
-        "Channel 10",
-        "Channel 11",
-        "Channel 12",
-        "Channel 13",
-        "Channel 14",
-        "Channel 15",
-        "Channel 16",
-        "Channel 17",
-        "Channel 18",
-        "Channel 19",
-        "Channel 20",
-        "Channel 21",
-        "Channel 22",
-        "Channel 23"
-    };
+  private XboxController driverController;
+  private SendableChooser<Command> autoChooser;
+  private AprilTagCamera frontCamera;
 
-    public RobotContainer(Robot robot) {
-        driverController = new XboxController(0);
+  private final String[] PDP_CHANNEL_NAMES = {
+    "Channel 0",
+    "Channel 1",
+    "Channel 2",
+    "Channel 3",
+    "Channel 4",
+    "Channel 5",
+    "Channel 6",
+    "Channel 7",
+    "Channel 8",
+    "Channel 9",
+    "Channel 10",
+    "Channel 11",
+    "Channel 12",
+    "Channel 13",
+    "Channel 14",
+    "Channel 15",
+    "Channel 16",
+    "Channel 17",
+    "Channel 18",
+    "Channel 19",
+    "Channel 20",
+    "Channel 21",
+    "Channel 22",
+    "Channel 23"
+  };
 
-        String swerveDirectory = "swerve/kitbot";
-        //subsystems used in all robots
-        swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
-        frontLeds = new FrontLeds(6, 54);
-        rearLeds = new RearLeds(frontLeds);
-        if(Robot.isSimulation()) {
-            //drive fast in simulation
-            swerveDrive.setMaximumSpeed(5, Math.PI);
-            //start in red zone since simulation defaults to red 1 station to make field oriented easier
-            swerveDrive.resetOdometry(new Pose2d(16.28, 4.03,Rotation2d.fromDegrees(180)));
-        }
-        else {
-            swerveDrive.setMaximumSpeed(1, Math.PI/2);
-        }
+  public RobotContainer(Robot robot) {
+    driverController = new XboxController(0);
 
-        vision = new Vision(swerveDrive);
-        frontCamera = new AprilTagCamera("front",
-            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
-            new Translation3d(0.363,
-                                0,
-                                0.31),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
-
-        vision.addCamera(frontCamera);
-        /*
-        vision.addCamera(new AprilTagCamera("rear",
-            new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
-            new Translation3d(-0.363,
-                                0,
-                                0.5),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-        */
-        //add some buttons to press for development
-        /*
-        SmartDashboard.putData("Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.WheelsStraight()));
-        SmartDashboard.putData("Wheels Crossed", new MoveWheels(swerveDrive, MoveWheels.WheelsCrossed()));
-        SmartDashboard.putData("Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.WheelsDiamond()));
-        SmartDashboard.putData("Drive Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsStraight()));
-        SmartDashboard.putData("Drive Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsDiamond()));
-        */
-        //SmartDashboard.putData("Test Leds", new TestLeds(leds));
-        SmartDashboard.putData("Fine Drive to Pose", swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
-
-        // Register Named Commands for PathPlanner
-        //NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));
-        //NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
-        NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
-        NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
-
-        // Build an auto chooser. This will use Commands.none() as the default option.
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        //periodic tasks to add
-        robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
-        robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
+    String swerveDirectory = "swerve/kitbot";
+    // subsystems used in all robots
+    swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
+    frontLeds = new FrontLeds(6, 54);
+    rearLeds = new RearLeds(frontLeds);
+    if (Robot.isSimulation()) {
+      // drive fast in simulation
+      swerveDrive.setMaximumSpeed(5, Math.PI);
+      // start in red zone since simulation defaults to red 1 station to make field oriented easier
+      swerveDrive.resetOdometry(new Pose2d(16.28, 4.03, Rotation2d.fromDegrees(180)));
+    } else {
+      swerveDrive.setMaximumSpeed(1, Math.PI / 2);
     }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-     * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    public void configureBindings() {
-        // Applies deadbands and inverts controls because joysticks
-        // are back-right positive while robot
-        // controls are front-left positive
-        // left stick controls translation
-        // right stick controls the angular velocity of the robot
-        Command driveFieldOrientedAnglularVelocity = swerveDrive.driveCommand(
+    vision = new Vision(swerveDrive);
+    frontCamera =
+        new AprilTagCamera(
+            "front",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
+            new Translation3d(0.363, 0, 0.31),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    vision.addCamera(frontCamera);
+    /*
+    vision.addCamera(new AprilTagCamera("rear",
+        new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
+        new Translation3d(-0.363,
+                            0,
+                            0.5),
+        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
+    */
+    // add some buttons to press for development
+    /*
+    SmartDashboard.putData("Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.WheelsStraight()));
+    SmartDashboard.putData("Wheels Crossed", new MoveWheels(swerveDrive, MoveWheels.WheelsCrossed()));
+    SmartDashboard.putData("Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.WheelsDiamond()));
+    SmartDashboard.putData("Drive Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsStraight()));
+    SmartDashboard.putData("Drive Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsDiamond()));
+    */
+    // SmartDashboard.putData("Test Leds", new TestLeds(leds));
+    SmartDashboard.putData(
+        "Fine Drive to Pose",
+        swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
+
+    // Register Named Commands for PathPlanner
+    // NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));
+    // NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
+    NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
+    NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
+
+    // Build an auto chooser. This will use Commands.none() as the default option.
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // periodic tasks to add
+    robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
+    robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
+  }
+
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
+  public void configureBindings() {
+    // Applies deadbands and inverts controls because joysticks
+    // are back-right positive while robot
+    // controls are front-left positive
+    // left stick controls translation
+    // right stick controls the angular velocity of the robot
+    Command driveFieldOrientedAnglularVelocity =
+        swerveDrive.driveCommand(
             () -> MathUtil.applyDeadband(driverController.getLeftY() * -1, 0.05),
             () -> MathUtil.applyDeadband(driverController.getLeftX() * -1, 0.05),
             () -> driverController.getRightX() * -1);
 
-        if (Robot.isSimulation()) {
-            new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
-            new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
-        } else {
-            new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
-        }
-        new Trigger(driverController::getLeftStickButton).whileTrue(swerveDrive.swerveLock());
-        
-        //setup default commands that are used for driving
-        swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-        //leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
-        frontLeds.setDefaultCommand(new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
-        rearLeds.setDefaultCommand(new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
-        //rearLeds.setDefaultCommand(new TestLeds(rearLeds));
+    if (Robot.isSimulation()) {
+      new Trigger(driverController::getAButton)
+          .whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
+      new Trigger(driverController::getYButton)
+          .whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
+    } else {
+      new Trigger(driverController::getAButton)
+          .whileTrue(swerveDrive.driveToPose(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
     }
+    new Trigger(driverController::getLeftStickButton).whileTrue(swerveDrive.swerveLock());
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-    }
+    // setup default commands that are used for driving
+    swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+    frontLeds.setDefaultCommand(
+        new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+    rearLeds.setDefaultCommand(
+        new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+    // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+  }
 }
