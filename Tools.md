@@ -3,7 +3,7 @@
 https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html
 
 * FRC Game Tools (like the driver station and rio imager)
-https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html 
+https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html
 
 * Phoenix Tuner (how to configure CTRE devices)
 https://apps.microsoft.com/store/detail/phoenix-tuner-x/9NVV4PWDW27Z
@@ -11,7 +11,7 @@ https://apps.microsoft.com/store/detail/phoenix-tuner-x/9NVV4PWDW27Z
 * Rev Client (how to configure Rev devices)
 https://docs.revrobotics.com/rev-hardware-client/
 
-* GitHub Desktop (easier git access and it installs the git tool set for development) 
+* GitHub Desktop (easier git access and it installs the git tool set for development)
 https://desktop.github.com/
 
 * PathPlanner for autonomous paths

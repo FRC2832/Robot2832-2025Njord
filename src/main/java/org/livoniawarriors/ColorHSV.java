@@ -4,16 +4,15 @@
 
 package org.livoniawarriors;
 
-import java.util.Objects;
-
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import java.util.Objects;
 
 /**
  * Represents a color in HSV space.
- * 
- * In WPILib, the convention is hue [0-180)*, saturation [0-255], value
- * [0-255].  See https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html#using-hsv-values
+ *
+ * <p>In WPILib, the convention is hue [0-180)*, saturation [0-255], value [0-255]. See
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html#using-hsv-values
  * for more info.
  */
 public class ColorHSV {
@@ -74,15 +73,15 @@ public class ColorHSV {
     return fromColor(new Color(color));
   }
 
-  //rgb are 0-255
+  // rgb are 0-255
   public static ColorHSV fromRGB(int red, int green, int blue) {
     return fromColor(new Color(red, green, blue));
   }
 
-  //throws IllegalArguementException
-  //public static ColorHSV fromHexString(String hexString) {
+  // throws IllegalArguementException
+  // public static ColorHSV fromHexString(String hexString) {
   //  return fromColor(new Color(hexString));
-  //}
+  // }
 
   public Color toColor() {
     // Loosely based on
@@ -107,7 +106,7 @@ public class ColorHSV {
     final double V = value / 255.0;
 
     // Because hue is 0-180 rather than 0-360 use 30 not 60
-    final int region = (int)(hue / 30) % 6;
+    final int region = (int) (hue / 30) % 6;
     switch (region) {
       case 0:
         return new Color(V, X + m, m);
@@ -138,10 +137,10 @@ public class ColorHSV {
     }
     ColorHSV colorHSV = (ColorHSV) other;
 
-    //to keep our 12 bit precision, we use 8 bits for the components, 
-    //so 4 bits left for precision (1/2^4 = 1/16 = 0.0625)
-    return Math.abs(colorHSV.hue - hue) <= 0.0625 
-        && Math.abs(colorHSV.sat - sat) <= 0.0625 
+    // to keep our 12 bit precision, we use 8 bits for the components,
+    // so 4 bits left for precision (1/2^4 = 1/16 = 0.0625)
+    return Math.abs(colorHSV.hue - hue) <= 0.0625
+        && Math.abs(colorHSV.sat - sat) <= 0.0625
         && Math.abs(colorHSV.value - value) <= 0.0625;
   }
 

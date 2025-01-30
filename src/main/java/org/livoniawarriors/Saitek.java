@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * https://www.logitechg.com/en-us/products/farm/farm-simulator-side-panel.945-000031.html
  */
 public class Saitek extends GenericHID {
-  
-  
+
   /** Represents a digital button on an Saitek. */
   public enum Button {
     pinkTopLeft(1),
@@ -29,14 +28,14 @@ public class Saitek extends GenericHID {
     yellowBottomLeft(12),
     yellowBottomMiddle(14),
     yellowBottomRight(16);
-  
+
     public final int value;
+
     Button(int value) {
       this.value = value;
     }
-
-
   }
+
   public enum Axis {
     xAxis1(0),
     yAxis1(1),
@@ -50,15 +49,11 @@ public class Saitek extends GenericHID {
     Axis(int value) {
       this.value = value;
     }
-
-
   }
 
   public Saitek(final int port) {
     super(port);
   }
-
-
 
   public double getxAxis1() {
     return getRawAxis(Axis.xAxis1.value);
@@ -67,11 +62,11 @@ public class Saitek extends GenericHID {
   public double getyAxis1() {
     return getRawAxis(Axis.yAxis1.value);
   }
-  
+
   public double rotate1() {
     return getRawAxis(Axis.rotate1.value);
   }
-  
+
   public double getxAxis2() {
     return getRawAxis(Axis.xAxis2.value);
   }
@@ -79,135 +74,117 @@ public class Saitek extends GenericHID {
   public double getyAxis2() {
     return getRawAxis(Axis.yAxis2.value);
   }
-  
+
   public double rotate2() {
     return getRawAxis(Axis.rotate2.value);
   }
 
-//Pink Buttons
-  //Top Left
+  // Pink Buttons
+  // Top Left
   public boolean getPinkTopLeftButton() {
     return getRawButton(Button.pinkTopLeft.value);
   }
-
 
   public boolean getPinkTopLeftButtonPressed() {
     return getRawButtonPressed(Button.pinkTopLeft.value);
   }
 
-
   public boolean getPinkTopLeftButtonReleased() {
     return getRawButtonReleased(Button.pinkTopLeft.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkTopLeft(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkTopLeftButton);
   }
-  //Top middle
+  // Top middle
   public boolean getPinkTopMiddleButton() {
     return getRawButton(Button.pinkTopMiddle.value);
   }
-
 
   public boolean getPinkTopMiddleButtonPressed() {
     return getRawButtonPressed(Button.pinkTopMiddle.value);
   }
 
-
   public boolean getPinkTopMiddleButtonReleased() {
     return getRawButtonReleased(Button.pinkTopMiddle.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkTopMiddle(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkTopMiddleButton);
   }
-  //Top Right
+  // Top Right
   public boolean getPinkTopRightButton() {
     return getRawButton(Button.pinkTopRight.value);
   }
-
 
   public boolean getPinkTopRightButtonPressed() {
     return getRawButtonPressed(Button.pinkTopRight.value);
   }
 
-
   public boolean getPinkTopRightButtonReleased() {
     return getRawButtonReleased(Button.pinkTopRight.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkTopRight(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkTopRightButton);
   }
-  //Bottom Left
+  // Bottom Left
   public boolean getPinkBottomLeftButton() {
     return getRawButton(Button.pinkBottomLeft.value);
   }
-
 
   public boolean getPinkBottomLeftButtonPressed() {
     return getRawButtonPressed(Button.pinkBottomLeft.value);
   }
 
-
   public boolean getPinkBottomLeftButtonReleased() {
     return getRawButtonReleased(Button.pinkBottomLeft.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkBottomLeft(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkBottomLeftButton);
   }
-  //Bottom Middle
+  // Bottom Middle
   public boolean getPinkBottomMiddleButton() {
     return getRawButton(Button.pinkBottomMiddle.value);
   }
-
 
   public boolean getPinkBottomMiddleButtonPressed() {
     return getRawButtonPressed(Button.pinkBottomMiddle.value);
   }
 
-
   public boolean getPinkBottomMiddleButtonReleased() {
     return getRawButtonReleased(Button.pinkBottomMiddle.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkBottomMiddle(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkBottomMiddleButton);
   }
 
-  //Bottom Right
+  // Bottom Right
   public boolean getPinkBottomRightButton() {
     return getRawButton(Button.pinkBottomRight.value);
   }
-
 
   public boolean getPinkBottomRightButtonPressed() {
     return getRawButtonPressed(Button.pinkBottomRight.value);
   }
 
-
   public boolean getPinkBottomRightButtonReleased() {
     return getRawButtonReleased(Button.pinkBottomRight.value);
   }
-
 
   @SuppressWarnings("MethodName")
   public BooleanEvent pinkBottomRight(EventLoop loop) {
     return new BooleanEvent(loop, this::getPinkBottomRightButton);
   }
-  
-// Orange Buttons  
+
+  // Orange Buttons
   // Top Left
   public boolean getOrangeTopLeftButton() {
     return getRawButton(Button.orangeTopLeft.value);
@@ -225,7 +202,7 @@ public class Saitek extends GenericHID {
   public BooleanEvent orangeTopLeft(EventLoop loop) {
     return new BooleanEvent(loop, this::getOrangeTopLeftButton);
   }
-  
+
   // Top Right
   public boolean getOrangeTopRightButton() {
     return getRawButton(Button.orangeTopRight.value);
@@ -243,7 +220,7 @@ public class Saitek extends GenericHID {
   public BooleanEvent orangeTopRight(EventLoop loop) {
     return new BooleanEvent(loop, this::getOrangeTopRightButton);
   }
- 
+
   // Bottom Left
   public boolean getOrangeBottomLeftButton() {
     return getRawButton(Button.orangeBottomLeft.value);
@@ -280,7 +257,7 @@ public class Saitek extends GenericHID {
     return new BooleanEvent(loop, this::getOrangeBottomRightButton);
   }
 
-// Yellow Buttons
+  // Yellow Buttons
   // Top Left
   public boolean getYellowTopLeftButton() {
     return getRawButton(Button.yellowTopLeft.value);
@@ -334,7 +311,7 @@ public class Saitek extends GenericHID {
   public BooleanEvent yellowTopRight(EventLoop loop) {
     return new BooleanEvent(loop, this::getYellowTopRightButton);
   }
-  
+
   // Bottom Left
   public boolean getYellowBottomLeftButton() {
     return getRawButton(Button.yellowBottomLeft.value);
@@ -388,4 +365,4 @@ public class Saitek extends GenericHID {
   public BooleanEvent yellowBottomRight(EventLoop loop) {
     return new BooleanEvent(loop, this::getYellowBottomRightButton);
   }
-} 
+}
