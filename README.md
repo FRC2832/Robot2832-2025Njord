@@ -1,3 +1,12 @@
+# Current Robot Status
+https://docs.google.com/spreadsheets/d/1hr8jmQvniOeUqg0M61z8sn0dWsT9DFsEs8XHRyx0pIs/edit?usp=sharing (requires Warriors login)
+
+# Logging:
+We use AdvantageKit to log variables, you can use the annotation `@AutoLogOutput` to automatically log a variable, or if you need to give it a specific name due to multiple instances of the class, `@AutoLogOutput(key = "Camera {name}/lastReadTimestamp")`.  You probably need to add in `AutoLogOutputManager.addObject(this);`.
+
+See https://docs.advantagekit.org/data-flow/recording-outputs/annotation-logging
+
+## Template 
 This repository is designed to be a template library to start robot development with.  It also contains standard library functions the team has developed to help develop future robots.  It should always be updated to the latest WpiLib release.
 
 Any code that is in the org.livoniawarriors folder is designed to be a library.  Ideally, nothing in that logic needs to change, and it can't have any configurations dependent on current robot code (aka from the frc.robot project).  In the future, this might become it's own project with a git subproject into a folder to load into.  Any configuring of the core should be done with persistent network tables so that the systems can be tuned.
@@ -16,8 +25,3 @@ Robot logging is on by default, we use standard [WpiLog](https://docs.wpilib.org
 
 # Differences from standard projects:
 * Most teams have seperate folders for subsystems and commands.  Instead, we put all things related to the subsystem (both commands and subsystems) in the same folder, so it's easy to see what code is designed to work together.
-
-# Logging:
-We use AdvantageKit to log variables, you can use the annotation `@AutoLogOutput` to automatically log a variable, or if you need to give it a specific name due to multiple instances of the class, `@AutoLogOutput(key = "Camera {name}/lastReadTimestamp")`.  You probably need to add in `AutoLogOutputManager.addObject(this);`.
-
-See https://docs.advantagekit.org/data-flow/recording-outputs/annotation-logging
