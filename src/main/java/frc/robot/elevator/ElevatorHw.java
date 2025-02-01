@@ -13,8 +13,10 @@ public class ElevatorHw extends Elevator {
 
     leftMotor = new TalonFXMotor("Left Elevator", 8);
     rightMotor = new TalonFXMotor("Right Elevator", 9, "rio", true);
-    leftMotor.setSoftLimits(16, 80);
-    leftMotor.setScaleFactor(1);
+    // leftMotor.setSoftLimits(16, 80);
+    // leftMotor.setScaleFactor(1);
+    // leftMotor.setCurrentLimit(70);
+    leftMotor.setBrakeMode(true);
 
     distSensor = new LaserCan(0);
     /*

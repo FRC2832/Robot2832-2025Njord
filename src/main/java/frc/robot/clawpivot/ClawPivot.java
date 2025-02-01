@@ -1,19 +1,25 @@
 package frc.robot.clawpivot;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutputManager;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 
 public abstract class ClawPivot extends SubsystemBase {
   boolean pidEnabled;
-  public abstract void setPower(double power);
-  public abstract void setAngle(double angle);
+
+  abstract void setPower(double power);
+
+  abstract void setAngle(double angle);
+
+  @AutoLogOutput
   public abstract double getSensorAngle();
+
+  @AutoLogOutput
   public abstract double getAngle();
-  public abstract void setEncoderPosition(double position);
+
+  abstract void setEncoderPosition(double position);
 
   public ClawPivot() {
     super();

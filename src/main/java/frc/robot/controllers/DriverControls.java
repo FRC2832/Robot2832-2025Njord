@@ -1,10 +1,8 @@
 package frc.robot.controllers;
 
-import org.livoniawarriors.T16000M;
-
-import org.livoniawarriors.UtilFunctions;
-
 import edu.wpi.first.networktables.DoubleSubscriber;
+import org.livoniawarriors.T16000M;
+import org.livoniawarriors.UtilFunctions;
 
 public class DriverControls {
   private T16000M driverLeft;

@@ -6,7 +6,7 @@ We use AdvantageKit to log variables, you can use the annotation `@AutoLogOutput
 
 See https://docs.advantagekit.org/data-flow/recording-outputs/annotation-logging
 
-## Template 
+## Template
 This repository is designed to be a template library to start robot development with.  It also contains standard library functions the team has developed to help develop future robots.  It should always be updated to the latest WpiLib release.
 
 Any code that is in the org.livoniawarriors folder is designed to be a library.  Ideally, nothing in that logic needs to change, and it can't have any configurations dependent on current robot code (aka from the frc.robot project).  In the future, this might become it's own project with a git subproject into a folder to load into.  Any configuring of the core should be done with persistent network tables so that the systems can be tuned.
