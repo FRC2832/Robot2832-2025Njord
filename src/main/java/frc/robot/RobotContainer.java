@@ -22,6 +22,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.clawpivot.ClawPivot;
+import frc.robot.controllers.OperatorControls;
+import frc.robot.elevator.Elevator;
+import frc.robot.elevator.ElevatorHw;
 import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
@@ -45,6 +49,8 @@ public class RobotContainer {
   private FrontLeds frontLeds;
   private RearLeds rearLeds;
   private Vision vision;
+  private Elevator elevator;
+  private ClawPivot pivot;
 
   private XboxController driverController;
   private SendableChooser<Command> autoChooser;
@@ -85,6 +91,8 @@ public class RobotContainer {
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     frontLeds = new FrontLeds(6, 54);
     rearLeds = new RearLeds(frontLeds);
+    elevator = new ElevatorHw();
+
     if (Robot.isSimulation()) {
       // drive fast in simulation
       swerveDrive.setMaximumSpeed(5, Math.PI);
@@ -150,6 +158,8 @@ public class RobotContainer {
    * joysticks}.
    */
   public void configureBindings() {
+    OperatorControls op = new OperatorControls();
+
     // Applies deadbands and inverts controls because joysticks
     // are back-right positive while robot
     // controls are front-left positive
@@ -180,6 +190,9 @@ public class RobotContainer {
     rearLeds.setDefaultCommand(
         new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
     // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
+
+    elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
+    pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
   }
 
   /**
