@@ -16,4 +16,8 @@ public class OperatorControls {
   public double getPivotRequest() {
     return -operator.getRightY();
   }
+
+  public double getIntakeRequest() {
+    return operator.getRightTriggerAxis()-operator.getLeftTriggerAxis();
+  }
 }

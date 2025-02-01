@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.clawintake.ClawIntake;
+import frc.robot.clawintake.ClawIntakeHw;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
 import frc.robot.controllers.OperatorControls;
@@ -52,6 +54,7 @@ public class RobotContainer {
   private Vision vision;
   private Elevator elevator;
   private ClawPivot pivot;
+  private ClawIntake intake;
 
   private XboxController driverController;
   private SendableChooser<Command> autoChooser;
@@ -94,6 +97,7 @@ public class RobotContainer {
     rearLeds = new RearLeds(frontLeds);
     elevator = new ElevatorHw();
     pivot = new ClawPivotHw();
+    intake = new ClawIntakeHw();
 
     if (Robot.isSimulation()) {
       // drive fast in simulation
@@ -195,6 +199,7 @@ public class RobotContainer {
 
     elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
     pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
+    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest));
   }
 
   /**
