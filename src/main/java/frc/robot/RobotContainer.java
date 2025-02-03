@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -26,6 +24,7 @@ import frc.robot.clawintake.ClawIntake;
 import frc.robot.clawintake.ClawIntakeHw;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
+import frc.robot.controllers.DriverControls;
 import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
 import frc.robot.elevator.ElevatorHw;
@@ -56,7 +55,6 @@ public class RobotContainer {
   private ClawPivot pivot;
   private ClawIntake intake;
 
-  private XboxController driverController;
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
 
@@ -88,8 +86,6 @@ public class RobotContainer {
   };
 
   public RobotContainer(Robot robot) {
-    driverController = new XboxController(0);
-
     String swerveDirectory = "swerve/kitbot";
     // subsystems used in all robots
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
@@ -118,30 +114,12 @@ public class RobotContainer {
             VecBuilder.fill(0.5, 0.5, 1));
 
     vision.addCamera(frontCamera);
-    /*
-    vision.addCamera(new AprilTagCamera("rear",
-        new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
-        new Translation3d(-0.363,
-                            0,
-                            0.5),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-    */
     // add some buttons to press for development
-    /*
-    SmartDashboard.putData("Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.WheelsStraight()));
-    SmartDashboard.putData("Wheels Crossed", new MoveWheels(swerveDrive, MoveWheels.WheelsCrossed()));
-    SmartDashboard.putData("Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.WheelsDiamond()));
-    SmartDashboard.putData("Drive Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsStraight()));
-    SmartDashboard.putData("Drive Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsDiamond()));
-    */
-    // SmartDashboard.putData("Test Leds", new TestLeds(leds));
     SmartDashboard.putData(
         "Fine Drive to Pose",
         swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
 
     // Register Named Commands for PathPlanner
-    // NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));
-    // NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
     NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
     NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
 
@@ -164,29 +142,13 @@ public class RobotContainer {
    * joysticks}.
    */
   public void configureBindings() {
+    DriverControls driver = new DriverControls();
     OperatorControls op = new OperatorControls();
 
-    // Applies deadbands and inverts controls because joysticks
-    // are back-right positive while robot
-    // controls are front-left positive
-    // left stick controls translation
-    // right stick controls the angular velocity of the robot
     Command driveFieldOrientedAnglularVelocity =
-        swerveDrive.driveCommand(
-            () -> MathUtil.applyDeadband(driverController.getLeftY() * -1, 0.05),
-            () -> MathUtil.applyDeadband(driverController.getLeftX() * -1, 0.05),
-            () -> driverController.getRightX() * -1);
+        swerveDrive.driveCommand(driver::getDriveX, driver::getDriveY, driver::getTurn);
 
-    if (Robot.isSimulation()) {
-      new Trigger(driverController::getAButton)
-          .whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
-      new Trigger(driverController::getYButton)
-          .whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
-    } else {
-      new Trigger(driverController::getAButton)
-          .whileTrue(swerveDrive.driveToPose(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
-    }
-    new Trigger(driverController::getLeftStickButton).whileTrue(swerveDrive.swerveLock());
+    driver.getSwerveLockTrigger().whileTrue(swerveDrive.swerveLock());
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);

@@ -18,6 +18,6 @@ public class OperatorControls {
   }
 
   public double getIntakeRequest() {
-    return operator.getRightTriggerAxis()-operator.getLeftTriggerAxis();
+    return operator.getRightTriggerAxis() - operator.getLeftTriggerAxis();
   }
 }

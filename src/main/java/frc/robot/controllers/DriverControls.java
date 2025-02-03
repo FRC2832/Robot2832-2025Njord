@@ -1,6 +1,7 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.livoniawarriors.T16000M;
 import org.livoniawarriors.UtilFunctions;
 
@@ -28,5 +29,13 @@ public class DriverControls {
   public double getTurn() {
     var dead = deadband.get();
     return -UtilFunctions.deadband(driverLeft.getxAxis1(), dead);
+  }
+
+  public boolean getSwerveLock() {
+    return driverLeft.getLeft();
+  }
+
+  public Trigger getSwerveLockTrigger() {
+    return new Trigger(this::getSwerveLock);
   }
 }
