@@ -10,6 +10,7 @@ public class PieceTypeSwitcher extends SubsystemBase {
   @AutoLogOutput private String pieceSelected;
 
   public PieceTypeSwitcher() {
+    super();
     pieceSelected = "Coral";
     AutoLogOutputManager.addObject(this);
   }
