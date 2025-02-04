@@ -5,7 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.util.PPLibTelemetry;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -98,6 +100,9 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isFMSAttached()) {
       PPLibTelemetry.enableCompetitionMode();
     }
+
+    // add webserver to allow download of the dashboard in Elastic
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
     // Start AdvantageKit logger
     Logger.start();
