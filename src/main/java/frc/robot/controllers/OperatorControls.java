@@ -22,11 +22,11 @@ public class OperatorControls {
     return operator.getRightTriggerAxis() - operator.getLeftTriggerAxis();
   }
 
-  public boolean getSwitchPiece(){
+  public boolean getSwitchPiece() {
     return operator.getRightStickButton();
   }
 
-  public Trigger getSwitchPieceTrigger(){
+  public Trigger getSwitchPieceTrigger() {
     return new Trigger(this::getSwitchPiece);
   }
 }
