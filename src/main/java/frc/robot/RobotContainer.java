@@ -32,6 +32,7 @@ import frc.robot.elevator.ElevatorHw;
 import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
+import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
@@ -55,6 +56,7 @@ public class RobotContainer {
   private Elevator elevator;
   private ClawPivot pivot;
   private ClawIntake intake;
+  private PieceTypeSwitcher pieceTypeSwitcher;
 
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
@@ -95,6 +97,7 @@ public class RobotContainer {
     elevator = new ElevatorHw();
     pivot = new ClawPivotHw();
     intake = new ClawIntakeHw();
+    pieceTypeSwitcher = new PieceTypeSwitcher();
 
     if (Robot.isSimulation()) {
       // drive fast in simulation
@@ -154,7 +157,9 @@ public class RobotContainer {
         swerveDrive.driveCommand(driver::getDriveX, driver::getDriveY, driver::getTurn);
 
     driver.getSwerveLockTrigger().whileTrue(swerveDrive.swerveLock());
-
+    driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
+    driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));

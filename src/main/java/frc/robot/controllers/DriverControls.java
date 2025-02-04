@@ -38,4 +38,20 @@ public class DriverControls {
   public Trigger getSwerveLockTrigger() {
     return new Trigger(this::getSwerveLock);
   }
+
+  public boolean isFieldOrientedResetRequested() {
+    return driverRight.getMiddle();
+  }
+
+  public Trigger isFieldOrientedResetRequestedTrigger() {
+    return new Trigger(this::isFieldOrientedResetRequested);
+  }
+
+  public boolean getSwitchPiece() {
+    return driverLeft.getRight();
+  }
+
+  public Trigger getSwitchPieceTrigger() {
+    return new Trigger(this::getSwitchPiece);
+  }
 }
