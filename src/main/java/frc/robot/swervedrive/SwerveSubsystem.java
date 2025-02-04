@@ -751,6 +751,10 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.drive(new ChassisSpeeds());
   }
 
+  public Command zeroRobot(){
+    return runOnce(this::zeroGyroWithAlliance);
+  }
+
   public Command pushPartner() {
     return new PushPartner(this);
   }
