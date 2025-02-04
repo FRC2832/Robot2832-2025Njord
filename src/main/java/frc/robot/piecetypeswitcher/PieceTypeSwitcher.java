@@ -19,7 +19,7 @@ public class PieceTypeSwitcher extends SubsystemBase {
     return pieceSelected;
   }
 
-  public void setPieceSelected() {
+  public void togglePieceSelected() {
     if (pieceSelected == "Coral") {
       pieceSelected = "Algae";
     } else {
@@ -28,6 +28,6 @@ public class PieceTypeSwitcher extends SubsystemBase {
   }
 
   public Command switchPieceSelected() {
-    return runOnce(this::setPieceSelected);
+    return runOnce(this::togglePieceSelected);
   }
 }
