@@ -14,7 +14,7 @@ public class ClawPivotHw extends ClawPivot {
 
     // pivotMotor.setSoftLimits(16, 80);
     // pivotMotor.setScaleFactor(1);
-    // pivotMotor.setCurrentLimit(70);
+    pivotMotor.setCurrentLimit(10);
     pivotMotor.setBrakeMode(true);
   }
 
