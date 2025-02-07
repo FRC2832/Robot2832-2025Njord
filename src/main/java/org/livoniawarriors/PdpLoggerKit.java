@@ -16,7 +16,7 @@ public class PdpLoggerKit implements Runnable {
     // can't access conduit yet as it might not have initialized yet
     channels = new DoublePublisher[channelNames.length];
     for (int i = 0; i < channelNames.length; i++) {
-      channels[i] = UtilFunctions.getNtPub("/Pdp Channels/" + channelNames[i], 0.);
+      channels[i] = UtilFunctions.getNtPub("/Pdp Currents/" + channelNames[i], 0.);
     }
   }
 
