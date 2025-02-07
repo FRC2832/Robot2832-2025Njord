@@ -1,5 +1,8 @@
 package frc.robot.elevator;
 
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
@@ -19,17 +22,28 @@ public abstract class Elevator extends SubsystemBase {
   public abstract void setEncoderPosition(double position);
 
   boolean pidEnabled;
+  DoubleEntry heightPub;
 
   public Elevator() {
     super();
     AutoLogOutputManager.addObject(this);
     pidEnabled = false;
+    SmartDashboard.putData("Set Elevator 20", setPositionCmd(20));
+    SmartDashboard.putData("Set Elevator 70", setPositionCmd(70));
+    heightPub =
+        NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Height").getEntry(0);
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    heightPub.set(getPosition());
+  }
 
   public Command driveElevator(DoubleSupplier pct) {
     return run(() -> setPower(pct.getAsDouble()));
+  }
+
+  public Command setPositionCmd(double position) {
+    return run(() -> setPosition(position));
   }
 }

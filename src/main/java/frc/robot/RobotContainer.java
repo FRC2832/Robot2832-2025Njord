@@ -23,16 +23,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
 import frc.robot.clawintake.ClawIntakeHw;
+import frc.robot.clawintake.ClawIntakeSim;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
+import frc.robot.clawpivot.ClawPivotSim;
 import frc.robot.controllers.DriverControls;
 import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
 import frc.robot.elevator.ElevatorHw;
+import frc.robot.elevator.ElevatorSimul;
 import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
+import frc.robot.simulation.RobotSim;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
@@ -94,9 +98,6 @@ public class RobotContainer {
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     frontLeds = new FrontLeds(6, 54);
     rearLeds = new RearLeds(frontLeds);
-    elevator = new ElevatorHw();
-    pivot = new ClawPivotHw();
-    intake = new ClawIntakeHw();
     pieceTypeSwitcher = new PieceTypeSwitcher();
 
     if (Robot.isSimulation()) {
@@ -104,8 +105,14 @@ public class RobotContainer {
       swerveDrive.setMaximumSpeed(5, Math.PI);
       // start in red zone since simulation defaults to red 1 station to make field oriented easier
       swerveDrive.resetOdometry(new Pose2d(16.28, 4.03, Rotation2d.fromDegrees(180)));
+      intake = new ClawIntakeSim();
+      elevator = new ElevatorSimul();
+      pivot = new ClawPivotSim();
     } else {
       swerveDrive.setMaximumSpeed(1, Math.PI / 2);
+      intake = new ClawIntakeHw();
+      elevator = new ElevatorHw();
+      pivot = new ClawPivotHw();
     }
 
     vision = new Vision(swerveDrive);
@@ -138,6 +145,7 @@ public class RobotContainer {
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new DriverFeedback(), Robot.kDefaultPeriod, 0);
+    robot.addPeriodic(new RobotSim(swerveDrive::getPose), Robot.kDefaultPeriod, 0);
   }
 
   /**
