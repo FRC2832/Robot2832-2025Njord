@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,6 +37,7 @@ import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
+import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.simulation.RobotSim;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
@@ -180,6 +182,26 @@ public class RobotContainer {
     elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
     pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest));
+    new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
+    new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L2Coral));
+    new Trigger(() -> op.getL3Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L3Coral));
+    new Trigger(() -> op.getL4Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L4Coral));
+    new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.ProcessorAlgae));
+    new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.L2Algae));
+    new Trigger(() -> op.getL3Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.L3Algae));
+    new Trigger(() -> op.getL4Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.NetAlgae));
+    new Trigger(() -> op.getLollipopCommand() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.Lollipop));
+    new Trigger(() -> op.getLoadingPositionCommand())
+        .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
   }
 
   /**
@@ -189,5 +211,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public Command setScoringPosition(ScoringPositions position) {
+    return new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
   }
 }

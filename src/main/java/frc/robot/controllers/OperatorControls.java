@@ -30,6 +30,30 @@ public class OperatorControls {
     return operator.getRightStickButton();
   }
 
+  public boolean getL1Command() {
+    return operator.getAButton();
+  }
+
+  public boolean getL2Command() {
+    return operator.getBButton();
+  }
+
+  public boolean getL3Command() {
+    return operator.getXButton();
+  }
+
+  public boolean getL4Command() {
+    return operator.getYButton();
+  }
+
+  public boolean getLoadingPositionCommand() {
+    return operator.getRightBumperButton();
+  }
+
+  public boolean getLollipopCommand() {
+    return operator.getLeftBumperButton();
+  }
+
   public Trigger getSwitchPieceTrigger() {
     return new Trigger(this::getSwitchPiece);
   }

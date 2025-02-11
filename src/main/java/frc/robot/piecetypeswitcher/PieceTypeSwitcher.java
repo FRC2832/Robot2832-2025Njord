@@ -30,4 +30,12 @@ public class PieceTypeSwitcher extends SubsystemBase {
   public Command switchPieceSelected() {
     return runOnce(this::togglePieceSelected);
   }
+
+  public boolean isCoral() {
+    return pieceSelected == "Coral";
+  }
+
+  public boolean isAlgae() {
+    return pieceSelected == "Algae";
+  }
 }
