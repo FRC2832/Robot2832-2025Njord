@@ -9,8 +9,8 @@ public class ClawPivotHw extends ClawPivot {
 
   public ClawPivotHw() {
     super();
-    pivotMotor = new TalonFXMotor("Pivot", 7);
-    pivotAngle = new CANcoder(2);
+    pivotMotor = new TalonFXMotor("Pivot", 58);
+    pivotAngle = new CANcoder(57);
 
     // pivotMotor.setSoftLimits(16, 80);
     // pivotMotor.setScaleFactor(1);

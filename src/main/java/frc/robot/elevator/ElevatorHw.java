@@ -11,14 +11,14 @@ public class ElevatorHw extends Elevator {
   public ElevatorHw() {
     super();
 
-    leftMotor = new TalonFXMotor("Left Elevator", 8);
-    rightMotor = new TalonFXMotor("Right Elevator", 9, "rio", true);
+    leftMotor = new TalonFXMotor("Left Elevator", 55, "rio");
+    rightMotor = new TalonFXMotor("Right Elevator", 56, "rio", true);
     // leftMotor.setSoftLimits(16, 80);
     // leftMotor.setScaleFactor(1);
     leftMotor.setCurrentLimit(10);
     leftMotor.setBrakeMode(true);
 
-    distSensor = new LaserCan(0);
+    distSensor = new LaserCan(1);
     /*
     TalonFX leftKracken = (TalonFX)leftMotor.getBaseMotor();
     TalonFX rightKracken = (TalonFX)rightMotor.getBaseMotor();

@@ -68,6 +68,7 @@ public class RobotContainer {
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
 
+  public final String CTRE_CAN_BUS = "Njord";
   private final String[] PDP_CHANNEL_NAMES = {
     "Channel 0",
     "Channel 1",
@@ -96,7 +97,7 @@ public class RobotContainer {
   };
 
   public RobotContainer(Robot robot) {
-    String swerveDirectory = "swerve/kitbot";
+    String swerveDirectory = "swerve/njord";
     // subsystems used in all robots
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     frontLeds = new FrontLeds(6, 54);
