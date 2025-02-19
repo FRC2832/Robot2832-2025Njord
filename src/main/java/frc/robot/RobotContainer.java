@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,6 +45,7 @@ import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
 import java.io.File;
+import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
@@ -128,7 +130,7 @@ public class RobotContainer {
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    vision.addCamera(frontCamera);
+    // vision.addCamera(frontCamera);
     // add some buttons to press for development
     SmartDashboard.putData(
         "Fine Drive to Pose",
@@ -151,6 +153,7 @@ public class RobotContainer {
     robot.addPeriodic(new DriverFeedback(), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new RobotSim(swerveDrive::getPose), Robot.kDefaultPeriod, 0);
 
+    new LoopTimeLogger(robot, NetworkTableInstance.getDefault().getTable("Task Timings (ms)"));
     CanBridge.runTCP();
   }
 

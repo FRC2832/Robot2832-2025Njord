@@ -1,7 +1,11 @@
 package frc.robot.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,16 +17,21 @@ import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.livoniawarriors.UtilFunctions;
 
 public abstract class Elevator extends SubsystemBase {
+  final double OFFSET = 11.4;
+
   public abstract void setPosition(double distance);
 
   public abstract void setPower(double pct);
 
   @AutoLogOutput
-  public abstract double getPosition();
+  public abstract double getMotorPosition();
 
+  @AutoLogOutput
   public abstract double getDistanceSensor();
 
   public abstract void setEncoderPosition(double position);
+
+  abstract void updateSensor();
 
   boolean pidEnabled;
   DoubleEntry heightPub;
@@ -61,7 +70,12 @@ public abstract class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateSensor();
     heightPub.set(getPosition());
+
+    if (getDistanceSensor() < 0.3 && DriverStation.isDisabled()) {
+      // setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
+    }
   }
 
   public Command driveElevator(DoubleSupplier pct) {
@@ -78,5 +92,10 @@ public abstract class Elevator extends SubsystemBase {
 
   public double getSetPosition(ScoringPositions position) {
     return positions.get(position).getAsDouble();
+  }
+
+  @AutoLogOutput
+  public double getPosition() {
+    return OFFSET + Meter.of(getDistanceSensor()).in(Inches) + getMotorPosition();
   }
 }

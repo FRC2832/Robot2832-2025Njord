@@ -1,6 +1,12 @@
 package frc.robot.clawpivot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 
 public class ClawPivotHw extends ClawPivot {
@@ -12,10 +18,20 @@ public class ClawPivotHw extends ClawPivot {
     pivotMotor = new TalonFXMotor("Pivot", 58);
     pivotAngle = new CANcoder(57);
 
+    CANcoderConfiguration configuration = new CANcoderConfiguration();
+    CANcoderConfigurator cfg;
+    cfg = pivotAngle.getConfigurator();
+    var statusCode = cfg.refresh(configuration);
+    configuration.MagnetSensor.MagnetOffset = 0.109375;
+    configuration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    statusCode = cfg.apply(configuration);
+
     // pivotMotor.setSoftLimits(16, 80);
-    // pivotMotor.setScaleFactor(1);
+    pivotMotor.setScaleFactor(1 / 7.649);
     pivotMotor.setCurrentLimit(10);
     pivotMotor.setBrakeMode(true);
+
+    pivotMotor.setEncoderPosition(getSensorAngle());
   }
 
   @Override
@@ -32,7 +48,7 @@ public class ClawPivotHw extends ClawPivot {
 
   @Override
   public double getSensorAngle() {
-    return pivotAngle.getPosition().getValueAsDouble();
+    return Rotations.of(pivotAngle.getPosition().getValueAsDouble()).in(Degrees);
   }
 
   @Override

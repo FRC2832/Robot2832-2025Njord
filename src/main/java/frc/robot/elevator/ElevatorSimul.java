@@ -63,17 +63,20 @@ public class ElevatorSimul extends Elevator {
   }
 
   @Override
-  public double getPosition() {
+  public double getMotorPosition() {
     return Units.metersToInches(sim.getPositionMeters());
   }
 
   @Override
   public double getDistanceSensor() {
-    return getPosition();
+    return getMotorPosition();
   }
 
   @Override
   public void setEncoderPosition(double position) {
     sim.setState(Units.inchesToMeters(position), sim.getVelocityMetersPerSecond());
   }
+
+  @Override
+  void updateSensor() {}
 }
