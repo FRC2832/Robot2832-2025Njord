@@ -32,8 +32,15 @@ public final class MotorControls {
     }
   }
 
+  static final int NUM_LOOPS_LOGGED = 3;
+  static int Counts = 0;
+
   public static void UpdateLogs() {
     for (int i = 0; i < motors.size(); i++) {
+      // too much data is blocking robot functions, so we are logging less frequently
+      if ((Counts + i) % NUM_LOOPS_LOGGED != 0) {
+        continue;
+      }
       var motor = motors.get(i);
       var log = globalLogs.get(i);
       motor.updateLog();
@@ -44,6 +51,7 @@ public final class MotorControls {
       log.motorCurrent.set(motor.getSupplyCurrent());
       log.motorTemp.set(motor.getMotorTemp());
     }
+    Counts++;
   }
 }
 
