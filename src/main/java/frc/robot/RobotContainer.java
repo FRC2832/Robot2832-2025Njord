@@ -185,7 +185,7 @@ public class RobotContainer {
 
     elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
     pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
-    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest));
+    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
     new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())
