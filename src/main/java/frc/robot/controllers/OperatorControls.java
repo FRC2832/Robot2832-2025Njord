@@ -15,15 +15,15 @@ public class OperatorControls {
   }
 
   public double getElevatorRequest() {
-    return -UtilFunctions.deadband(operator.getLeftY(), opDeadband.get()) * 0.5;
+    return -UtilFunctions.deadband(operator.getLeftY(), opDeadband.get()) * 0.25;
   }
 
   public double getPivotRequest() {
-    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.5;
+    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.25;
   }
 
   public double getIntakeRequest() {
-    return operator.getRightTriggerAxis() - operator.getLeftTriggerAxis();
+    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis()) * 0.25;
   }
 
   public boolean getSwitchPiece() {
