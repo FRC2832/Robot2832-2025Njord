@@ -169,7 +169,16 @@ public class TalonFXMotor extends MotorControl {
     statorPub = motorTable.getDoubleTopic("Stator Current").publish();
 
     // load data from the motor
-    var statusCode = cfg.refresh(configuration);
+    StatusCode statusCode;
+    int count = 0;
+    do {
+      statusCode = cfg.refresh(configuration);
+      if (statusCode != StatusCode.OK) {
+        System.out.println("Motor '" + name + "' config access failed: " + statusCode.getName());
+      }
+      count++;
+    } while (statusCode != StatusCode.OK && count <= 10);
+
     scaleFactor = configuration.Feedback.SensorToMechanismRatio;
     pidConstants.kP = configuration.Slot0.kP;
     pidConstants.kI = configuration.Slot0.kI;
@@ -203,8 +212,6 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void configurePid() {
-    var statusCode = cfg.refresh(configuration);
-
     configuration.Slot0.kP = pidConstants.kP;
     configuration.Slot0.kI = pidConstants.kI;
     configuration.Slot0.kD = pidConstants.kD;
@@ -250,7 +257,6 @@ public class TalonFXMotor extends MotorControl {
    */
   @Override
   public void setScaleFactor(double factor) {
-    var statusCode = cfg.refresh(configuration);
     configuration.Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
         .withSensorToMechanismRatio(factor);
     configuration.MotionMagic.withMotionMagicCruiseVelocity(pidConstants.kVelMax)
@@ -341,7 +347,6 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setCurrentLimit(double limit) {
-    var statusCode = cfg.refresh(configuration.CurrentLimits);
     if (allowConfig) {
       statusCode =
           cfg.apply(
@@ -406,7 +411,6 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setInverted(boolean isInverted) {
-    var statusCode = cfg.refresh(configuration.MotorOutput);
     configuration.MotorOutput.withInverted(
         isInverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive);
     if (allowConfig) {
@@ -446,7 +450,6 @@ public class TalonFXMotor extends MotorControl {
   }
 
   public void setStatorCurrentLimit(double limit) {
-    var statusCode = cfg.refresh(configuration.CurrentLimits);
     if (allowConfig) {
       statusCode =
           cfg.apply(
@@ -462,7 +465,6 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setSoftLimits(double back, double forward) {
-    var statusCode = cfg.refresh(configuration.SoftwareLimitSwitch);
     configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = forward;
     configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = back;
