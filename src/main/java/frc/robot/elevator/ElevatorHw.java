@@ -57,6 +57,11 @@ public class ElevatorHw extends Elevator {
     leftMotor.setEncoderPosition(position);
   }
 
+  @Override
+  public void setVoltage(double voltage) {
+    leftMotor.setVoltage(voltage);
+  }
+
   double sensorValue = 0.133;
 
   @Override

@@ -78,5 +78,10 @@ public class ElevatorSimul extends Elevator {
   }
 
   @Override
+  public void setVoltage(double voltage) {
+    this.voltage = voltage;
+  }
+
   void updateSensor() {}
+
 }
