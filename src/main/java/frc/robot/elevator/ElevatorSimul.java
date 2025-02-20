@@ -76,4 +76,9 @@ public class ElevatorSimul extends Elevator {
   public void setEncoderPosition(double position) {
     sim.setState(Units.inchesToMeters(position), sim.getVelocityMetersPerSecond());
   }
+
+  @Override
+  public void setVoltage(double voltage) {
+    this.voltage = voltage;
+  }
 }

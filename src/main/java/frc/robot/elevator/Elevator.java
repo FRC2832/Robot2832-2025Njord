@@ -21,6 +21,8 @@ public abstract class Elevator extends SubsystemBase {
 
   public abstract void setEncoderPosition(double position);
 
+  public abstract void setVoltage(double volts);
+
   boolean pidEnabled;
   DoubleEntry heightPub;
 
@@ -40,10 +42,12 @@ public abstract class Elevator extends SubsystemBase {
   }
 
   public Command driveElevator(DoubleSupplier pct) {
-    return run(() -> setPower(pct.getAsDouble()));
+    return run(() -> setVoltage((pct.getAsDouble() * 12) + 0.5));
   }
 
   public Command setPositionCmd(double position) {
     return run(() -> setPosition(position));
   }
+
+
 }
