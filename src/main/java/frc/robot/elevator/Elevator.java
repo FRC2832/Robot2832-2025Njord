@@ -3,6 +3,7 @@ package frc.robot.elevator;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,6 +36,7 @@ public abstract class Elevator extends SubsystemBase {
 
   boolean pidEnabled;
   DoubleEntry heightPub;
+  BooleanSubscriber pidEnableNtSub;
   private HashMap<ScoringPositions, DoubleSupplier> positions;
 
   public Elevator() {
@@ -66,12 +68,18 @@ public abstract class Elevator extends SubsystemBase {
         ScoringPositions.NetAlgae, UtilFunctions.getSettingSub("ElevatorPos/NetAlgae", 80));
     positions.put(
         ScoringPositions.Lollipop, UtilFunctions.getSettingSub("ElevatorPos/Lollipop", 22.7));
+
+    updateSensor();
+    setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
+
+    pidEnableNtSub = UtilFunctions.getSettingSub("Elevator/EnablePid", false);
   }
 
   @Override
   public void periodic() {
     updateSensor();
     heightPub.set(getPosition());
+    pidEnabled = pidEnableNtSub.get();
 
     if (getDistanceSensor() < 0.3 && DriverStation.isDisabled()) {
       // setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
@@ -97,5 +105,9 @@ public abstract class Elevator extends SubsystemBase {
   @AutoLogOutput
   public double getPosition() {
     return OFFSET + Meter.of(getDistanceSensor()).in(Inches) + getMotorPosition();
+  }
+
+  public Command holdElevator() {
+    return new HoldElevator(this);
   }
 }

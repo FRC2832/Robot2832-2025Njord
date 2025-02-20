@@ -57,7 +57,7 @@ public class ElevatorHw extends Elevator {
     leftMotor.setEncoderPosition(position);
   }
 
-  double sensorValue = 0;
+  double sensorValue = 0.133;
 
   @Override
   void updateSensor() {

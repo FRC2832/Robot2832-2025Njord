@@ -1,5 +1,6 @@
 package frc.robot.clawpivot;
 
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +30,8 @@ public abstract class ClawPivot extends SubsystemBase {
 
   DoubleEntry clawPub;
 
+  BooleanSubscriber pidEnableNtSub;
+
   private HashMap<ScoringPositions, DoubleSupplier> positions;
 
   public ClawPivot() {
@@ -56,11 +59,13 @@ public abstract class ClawPivot extends SubsystemBase {
         UtilFunctions.getSettingSub("ClawPos/ProcessorAlgae", 179));
     positions.put(ScoringPositions.NetAlgae, UtilFunctions.getSettingSub("ClawPos/NetAlgae", 135));
     positions.put(ScoringPositions.Lollipop, UtilFunctions.getSettingSub("ClawPos/Lollipop", 185));
+    pidEnableNtSub = UtilFunctions.getSettingSub("ClawPivot/EnablePid", false);
   }
 
   @Override
   public void periodic() {
     clawPub.set(getAngle());
+    pidEnabled = pidEnableNtSub.get();
   }
 
   public Command drivePivot(DoubleSupplier pct) {
@@ -77,5 +82,9 @@ public abstract class ClawPivot extends SubsystemBase {
 
   public double getSetPosition(ScoringPositions position) {
     return positions.get(position).getAsDouble();
+  }
+
+  public Command holdClawPivot() {
+    return new HoldClawPivot(this);
   }
 }

@@ -186,8 +186,12 @@ public class RobotContainer {
         new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
     // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
 
-    elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
-    pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
+    new Trigger(() -> Math.abs(op.getElevatorRequest()) > 0.03)
+        .whileTrue(elevator.driveElevator(op::getElevatorRequest));
+    elevator.setDefaultCommand(elevator.holdElevator());
+    new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
+        .whileTrue(pivot.drivePivot(op::getPivotRequest));
+    pivot.setDefaultCommand(pivot.holdClawPivot());
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
@@ -222,5 +226,19 @@ public class RobotContainer {
 
   public Command setScoringPosition(ScoringPositions position) {
     return new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
-  }
+    /*
+    if (curAngle < 30 && destDist > 22) {
+        pivot out to 30
+        then
+            pid to position
+    }
+    if (curAngle > 30 && destDist < 22 && destAngle < 30){
+        drive to low position, 20 in
+        move claw/destination to position
+    }
+    if (curAngle > 30 && destAngle > 30) {
+        do old
+    }
+  */
+ }
 }
