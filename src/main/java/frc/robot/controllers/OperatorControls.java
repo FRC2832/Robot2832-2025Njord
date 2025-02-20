@@ -15,19 +15,43 @@ public class OperatorControls {
   }
 
   public double getElevatorRequest() {
-    return -UtilFunctions.deadband(operator.getLeftY(), opDeadband.get()) * 0.5;
+    return -UtilFunctions.deadband(operator.getLeftY(), opDeadband.get()) * 0.25;
   }
 
   public double getPivotRequest() {
-    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.5;
+    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.25;
   }
 
   public double getIntakeRequest() {
-    return operator.getRightTriggerAxis() - operator.getLeftTriggerAxis();
+    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis()) * 0.25;
   }
 
   public boolean getSwitchPiece() {
     return operator.getRightStickButton();
+  }
+
+  public boolean getL1Command() {
+    return operator.getAButton();
+  }
+
+  public boolean getL2Command() {
+    return operator.getBButton();
+  }
+
+  public boolean getL3Command() {
+    return operator.getXButton();
+  }
+
+  public boolean getL4Command() {
+    return operator.getYButton();
+  }
+
+  public boolean getLoadingPositionCommand() {
+    return operator.getRightBumperButton();
+  }
+
+  public boolean getLollipopCommand() {
+    return operator.getLeftBumperButton();
   }
 
   public Trigger getSwitchPieceTrigger() {

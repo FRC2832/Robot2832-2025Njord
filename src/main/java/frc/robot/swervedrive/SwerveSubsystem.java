@@ -6,6 +6,7 @@ package frc.robot.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -50,6 +51,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.livoniawarriors.UtilFunctions;
+import org.livoniawarriors.motorcontrol.TalonFXMotor;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -111,6 +113,13 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
     setMotorBrake(true);
+
+    for (var module : swerveDrive.getModules()) {
+      new TalonFXMotor(
+          module.configuration.name + "_drive", (TalonFX) module.getDriveMotor().getMotor(), true);
+      new TalonFXMotor(
+          module.configuration.name + "_turn", (TalonFX) module.getAngleMotor().getMotor(), true);
+    }
   }
 
   @Override

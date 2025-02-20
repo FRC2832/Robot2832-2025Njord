@@ -34,7 +34,7 @@ public class ElevatorSimul extends Elevator {
             Inches.of(1.981).in(Meters) / 2,
             Inches.of(16).in(Meters),
             Inches.of(80).in(Meters),
-            true,
+            false,
             Inches.of(16.5).in(Meters));
     m_controller = new PIDController(.1, 0.01, 0);
     m_feedforward = new ElevatorFeedforward(0, 0.38, 1.52, 0.04);
@@ -63,13 +63,13 @@ public class ElevatorSimul extends Elevator {
   }
 
   @Override
-  public double getPosition() {
+  public double getMotorPosition() {
     return Units.metersToInches(sim.getPositionMeters());
   }
 
   @Override
   public double getDistanceSensor() {
-    return getPosition();
+    return getMotorPosition();
   }
 
   @Override
@@ -81,4 +81,7 @@ public class ElevatorSimul extends Elevator {
   public void setVoltage(double voltage) {
     this.voltage = voltage;
   }
+
+  void updateSensor() {}
+
 }

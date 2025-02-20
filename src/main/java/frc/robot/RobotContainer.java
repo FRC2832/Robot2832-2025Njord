@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import au.grapplerobotics.CanBridge;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.VecBuilder;
@@ -12,12 +13,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,11 +39,13 @@ import frc.robot.leds.FrontLeds;
 import frc.robot.leds.RearLeds;
 import frc.robot.leds.ShowTargetInfo;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
+import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.simulation.RobotSim;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
 import java.io.File;
+import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
@@ -65,6 +70,7 @@ public class RobotContainer {
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
 
+  public final String CTRE_CAN_BUS = "Njord";
   private final String[] PDP_CHANNEL_NAMES = {
     "Channel 0",
     "Channel 1",
@@ -93,7 +99,7 @@ public class RobotContainer {
   };
 
   public RobotContainer(Robot robot) {
-    String swerveDirectory = "swerve/kitbot";
+    String swerveDirectory = "swerve/njord";
     // subsystems used in all robots
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     frontLeds = new FrontLeds(6, 54);
@@ -124,7 +130,7 @@ public class RobotContainer {
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    vision.addCamera(frontCamera);
+    // vision.addCamera(frontCamera);
     // add some buttons to press for development
     SmartDashboard.putData(
         "Fine Drive to Pose",
@@ -146,6 +152,9 @@ public class RobotContainer {
     robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new DriverFeedback(), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new RobotSim(swerveDrive::getPose), Robot.kDefaultPeriod, 0);
+
+    new LoopTimeLogger(robot, NetworkTableInstance.getDefault().getTable("Task Timings (ms)"));
+    CanBridge.runTCP();
   }
 
   /**
@@ -179,7 +188,27 @@ public class RobotContainer {
 
     elevator.setDefaultCommand(elevator.driveElevator(op::getElevatorRequest));
     pivot.setDefaultCommand(pivot.drivePivot(op::getPivotRequest));
-    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest));
+    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
+    new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
+    new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L2Coral));
+    new Trigger(() -> op.getL3Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L3Coral));
+    new Trigger(() -> op.getL4Command() && pieceTypeSwitcher.isCoral())
+        .whileTrue(setScoringPosition(ScoringPositions.L4Coral));
+    new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.ProcessorAlgae));
+    new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.L2Algae));
+    new Trigger(() -> op.getL3Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.L3Algae));
+    new Trigger(() -> op.getL4Command() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.NetAlgae));
+    new Trigger(() -> op.getLollipopCommand() && pieceTypeSwitcher.isAlgae())
+        .whileTrue(setScoringPosition(ScoringPositions.Lollipop));
+    new Trigger(() -> op.getLoadingPositionCommand())
+        .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
   }
 
   /**
@@ -189,5 +218,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public Command setScoringPosition(ScoringPositions position) {
+    return new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
   }
 }

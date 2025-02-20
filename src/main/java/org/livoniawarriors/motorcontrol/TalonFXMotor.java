@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.List;
 // TODO fix status code checking
 @SuppressWarnings("unused")
 public class TalonFXMotor extends MotorControl {
+  final double SECONDS_BETWEEN_FAULT_READS = 2;
   TalonFX motor;
   /** Current TalonFX configuration. */
   private TalonFXConfiguration configuration;
@@ -56,6 +58,10 @@ public class TalonFXMotor extends MotorControl {
   boolean allowConfig;
 
   DoublePublisher statorPub;
+  double lastFaultReadTime;
+  double lastStickyFaultReadTime;
+  String[] faultRead;
+  String[] stickyFaultsRead;
 
   public TalonFXMotor(String motorName, int id) {
     this(motorName, new TalonFX(id), false);
@@ -169,7 +175,16 @@ public class TalonFXMotor extends MotorControl {
     statorPub = motorTable.getDoubleTopic("Stator Current").publish();
 
     // load data from the motor
-    var statusCode = cfg.refresh(configuration);
+    StatusCode statusCode;
+    int count = 0;
+    do {
+      statusCode = cfg.refresh(configuration);
+      if (statusCode != StatusCode.OK) {
+        System.out.println("Motor '" + name + "' config access failed: " + statusCode.getName());
+      }
+      count++;
+    } while (statusCode != StatusCode.OK && count <= 10);
+
     scaleFactor = configuration.Feedback.SensorToMechanismRatio;
     pidConstants.kP = configuration.Slot0.kP;
     pidConstants.kI = configuration.Slot0.kI;
@@ -199,12 +214,14 @@ public class TalonFXMotor extends MotorControl {
     if (allowConfig) {
       statusCode = cfg.apply(configuration.SoftwareLimitSwitch);
     }
+
+    // start these at random times to smooth out reads on the bus
+    lastFaultReadTime = Math.random() * SECONDS_BETWEEN_FAULT_READS;
+    lastStickyFaultReadTime = Math.random() * SECONDS_BETWEEN_FAULT_READS;
   }
 
   @Override
   public void configurePid() {
-    var statusCode = cfg.refresh(configuration);
-
     configuration.Slot0.kP = pidConstants.kP;
     configuration.Slot0.kI = pidConstants.kI;
     configuration.Slot0.kD = pidConstants.kD;
@@ -219,7 +236,8 @@ public class TalonFXMotor extends MotorControl {
         .withMotionMagicAcceleration(pidConstants.kAccelMax);
     // implement in future? withMotionMagicExpo_kV, kA
     if (allowConfig) {
-      statusCode = cfg.apply(configuration);
+      var statusCode = cfg.apply(configuration.Slot0);
+      statusCode = cfg.apply(configuration.MotionMagic);
     }
   }
 
@@ -250,25 +268,39 @@ public class TalonFXMotor extends MotorControl {
    */
   @Override
   public void setScaleFactor(double factor) {
-    var statusCode = cfg.refresh(configuration);
     configuration.Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
         .withSensorToMechanismRatio(factor);
     configuration.MotionMagic.withMotionMagicCruiseVelocity(pidConstants.kVelMax)
         .withMotionMagicAcceleration(pidConstants.kAccelMax);
     if (allowConfig) {
-      statusCode = cfg.apply(configuration);
+      var statusCode = cfg.apply(configuration.Feedback);
+      statusCode = cfg.apply(configuration.MotionMagic);
     }
     scaleFactor = factor;
   }
 
   @Override
   public String[] getFaultArray() {
-    return handleFaults(motorFaults);
+    // this read is expensive, so buffer the results
+    if (faultRead == null
+        || Timer.getFPGATimestamp() > (lastFaultReadTime + SECONDS_BETWEEN_FAULT_READS)) {
+      faultRead = handleFaults(motorFaults);
+      lastFaultReadTime += SECONDS_BETWEEN_FAULT_READS;
+    }
+
+    return faultRead;
   }
 
   @Override
   public String[] getStickyFaultArray() {
-    return handleFaults(stickyFaults);
+    // this read is expensive, so buffer the results
+    if (stickyFaultsRead == null
+        || Timer.getFPGATimestamp() > (lastStickyFaultReadTime + SECONDS_BETWEEN_FAULT_READS)) {
+      stickyFaultsRead = handleFaults(stickyFaults);
+      lastStickyFaultReadTime += SECONDS_BETWEEN_FAULT_READS;
+    }
+
+    return stickyFaultsRead;
   }
 
   private String[] handleFaults(List<StatusSignal<Boolean>> faultList) {
@@ -341,9 +373,8 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setCurrentLimit(double limit) {
-    var statusCode = cfg.refresh(configuration.CurrentLimits);
     if (allowConfig) {
-      statusCode =
+      var statusCode =
           cfg.apply(
               configuration.CurrentLimits.withSupplyCurrentLimit(limit)
                   .withSupplyCurrentLimitEnable(true));
@@ -406,11 +437,10 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setInverted(boolean isInverted) {
-    var statusCode = cfg.refresh(configuration.MotorOutput);
     configuration.MotorOutput.withInverted(
         isInverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive);
     if (allowConfig) {
-      statusCode = cfg.apply(configuration.MotorOutput);
+      var statusCode = cfg.apply(configuration.MotorOutput);
     }
   }
 
@@ -446,9 +476,8 @@ public class TalonFXMotor extends MotorControl {
   }
 
   public void setStatorCurrentLimit(double limit) {
-    var statusCode = cfg.refresh(configuration.CurrentLimits);
     if (allowConfig) {
-      statusCode =
+      var statusCode =
           cfg.apply(
               configuration.CurrentLimits.withStatorCurrentLimit(limit)
                   .withStatorCurrentLimitEnable(true));
@@ -462,14 +491,13 @@ public class TalonFXMotor extends MotorControl {
 
   @Override
   public void setSoftLimits(double back, double forward) {
-    var statusCode = cfg.refresh(configuration.SoftwareLimitSwitch);
     configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = forward;
     configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = back;
     configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
     if (allowConfig) {
-      statusCode = cfg.apply(configuration.SoftwareLimitSwitch);
+      var statusCode = cfg.apply(configuration.SoftwareLimitSwitch);
     }
   }
 }

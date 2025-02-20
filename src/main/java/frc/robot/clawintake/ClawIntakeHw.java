@@ -13,8 +13,8 @@ public class ClawIntakeHw extends ClawIntake {
 
   public ClawIntakeHw() {
     super();
-    intakeMotor = new TalonFXMotor("Intake", 27);
-    pieceSensor = new LaserCan(1);
+    intakeMotor = new TalonFXMotor("Intake", 59);
+    pieceSensor = new LaserCan(2);
   }
 
   @Override
