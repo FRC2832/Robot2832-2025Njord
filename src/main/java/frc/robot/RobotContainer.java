@@ -30,6 +30,7 @@ import frc.robot.clawintake.ClawIntakeSim;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
 import frc.robot.clawpivot.ClawPivotSim;
+import frc.robot.clawpivot.PlaySong;
 import frc.robot.controllers.DriverControls;
 import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
@@ -149,6 +150,8 @@ public class RobotContainer {
 
     SmartDashboard.putData(
         "Clear Sticky Faults", new InstantCommand(MotorControls::ClearStickyFaults));
+
+    SmartDashboard.putData("Play Song", new PlaySong(pivot));
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);

@@ -1,5 +1,6 @@
 package frc.robot.clawpivot;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -19,6 +20,8 @@ public abstract class ClawPivot extends SubsystemBase {
   abstract void setPower(double power);
 
   abstract void setAngle(double angle);
+
+  abstract TalonFX getMotor();
 
   @AutoLogOutput
   public abstract double getSensorAngle();

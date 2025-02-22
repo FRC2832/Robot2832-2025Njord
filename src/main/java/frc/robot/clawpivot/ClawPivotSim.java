@@ -3,6 +3,7 @@ package frc.robot.clawpivot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -73,5 +74,10 @@ public class ClawPivotSim extends ClawPivot {
   @Override
   void setEncoderPosition(double position) {
     sim.setState(Math.toRadians(position), sim.getVelocityRadPerSec());
+  }
+
+  @Override
+  TalonFX getMotor() {
+    return new TalonFX(63);
   }
 }
