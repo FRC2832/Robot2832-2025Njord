@@ -8,6 +8,7 @@ public class HoldClawPivot extends Command {
 
   public HoldClawPivot(ClawPivot clawpivot) {
     this.clawpivot = clawpivot;
+    addRequirements(clawpivot);
   }
 
   @Override

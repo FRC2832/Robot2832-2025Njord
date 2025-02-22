@@ -8,6 +8,7 @@ public class HoldElevator extends Command {
 
   public HoldElevator(Elevator elevator) {
     this.elevator = elevator;
+    addRequirements(elevator);
   }
 
   @Override
