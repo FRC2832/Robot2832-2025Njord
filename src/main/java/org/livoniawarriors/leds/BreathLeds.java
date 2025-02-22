@@ -3,6 +3,9 @@ package org.livoniawarriors.leds;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import java.util.function.Supplier;
+
 import org.livoniawarriors.ColorHSV;
 
 /** This class shows a slow breathing pattern on the leds, slowly turning them on and off */
@@ -15,12 +18,15 @@ public class BreathLeds extends Command {
   AddressableLEDBuffer m_ledBuffer;
   int hue, sat, breath;
   boolean increment;
+  Supplier<Color> colorSup;
 
   public BreathLeds(ILedSubsystem leds, Color color) {
+    this(leds, () -> color);
+  }
+
+  public BreathLeds(ILedSubsystem leds, Supplier<Color> color) {
     this.leds = leds;
-    ColorHSV hsv = ColorHSV.fromColor(color);
-    hue = (int) hsv.hue;
-    sat = (int) hsv.sat;
+    this.colorSup = color;
     addRequirements(leds);
     m_ledBuffer = new AddressableLEDBuffer(leds.getLength());
   }
@@ -38,6 +44,9 @@ public class BreathLeds extends Command {
 
   @Override
   public void execute() {
+    ColorHSV hsv = ColorHSV.fromColor(colorSup.get());
+    hue = (int) hsv.hue;
+    sat = (int) hsv.sat;
     if (increment) {
       breath += STEP_VALUE;
       if (breath >= MAX_VALUE) {

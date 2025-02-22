@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -219,11 +220,15 @@ public class RobotContainer {
     new Trigger(() -> op.getLoadingPositionCommand())
         .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
 
-    new Trigger(
-            () -> {
-              return elevator.getCollisionWarning() || pivot.getCollisionWarning();
-            })
+    new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
+
+    new Trigger(this::isCollisionWarning)
+        .whileFalse(
+            new ConditionalCommand(
+                new BreathLeds(leds, Color.kYellow),
+                new BreathLeds(leds, Color.kAqua),
+                pieceTypeSwitcher::isCoral));
   }
 
   /**
@@ -233,6 +238,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public boolean isCollisionWarning() {
+    return elevator.getCollisionWarning() || pivot.getCollisionWarning();
   }
 
   public Command setScoringPosition(ScoringPositions position) {
