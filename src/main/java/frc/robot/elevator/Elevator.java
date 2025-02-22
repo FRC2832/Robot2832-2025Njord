@@ -1,12 +1,8 @@
 package frc.robot.elevator;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
-
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +15,7 @@ import org.livoniawarriors.UtilFunctions;
 
 public abstract class Elevator extends SubsystemBase {
   final double OFFSET = 11.4;
+  static final double kG = 0.5;
 
   public abstract void setPosition(double distance);
 
@@ -32,9 +29,8 @@ public abstract class Elevator extends SubsystemBase {
 
   public abstract void setEncoderPosition(double position);
 
-
   public abstract void setVoltage(double volts);
-  
+
   abstract void updateSensor();
 
   boolean pidEnabled;
@@ -72,11 +68,10 @@ public abstract class Elevator extends SubsystemBase {
     positions.put(
         ScoringPositions.Lollipop, UtilFunctions.getSettingSub("ElevatorPos/Lollipop", 22.7));
 
-    updateSensor();
-    setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
-
     pidEnableNtSub = UtilFunctions.getSettingSub("Elevator/EnablePid", false);
   }
+
+  boolean init = false;
 
   @Override
   public void periodic() {
@@ -84,13 +79,17 @@ public abstract class Elevator extends SubsystemBase {
     heightPub.set(getPosition());
     pidEnabled = pidEnableNtSub.get();
 
-    if (getDistanceSensor() < 0.3 && DriverStation.isDisabled()) {
+    if (!init) {
+      //TODO implement real zeroing of motor
+      setEncoderPosition(16.5);
+      init = true;
       // setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
+
     }
   }
 
-  public Command driveElevator(DoubleSupplier pct) {
-    return run(() -> setVoltage((pct.getAsDouble() * 12) + 0.5));
+  public Command driveElevator(DoubleSupplier pct, DoubleSupplier clawAngle) {
+    return new DriveElevator(this, clawAngle, pct);
   }
 
   public Command setPositionCmd(double position) {
@@ -107,7 +106,8 @@ public abstract class Elevator extends SubsystemBase {
 
   @AutoLogOutput
   public double getPosition() {
-    return OFFSET + Meter.of(getDistanceSensor()).in(Inches) + getMotorPosition();
+    return getMotorPosition();
+    // return OFFSET + Meter.of(getDistanceSensor()).in(Inches) + getMotorPosition();
   }
 
   public Command holdElevator() {

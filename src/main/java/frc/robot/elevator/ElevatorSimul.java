@@ -18,6 +18,7 @@ public class ElevatorSimul extends Elevator {
   double voltage;
   PIDController m_controller;
   ElevatorFeedforward m_feedforward;
+  double position = 0;
 
   public ElevatorSimul() {
     // gearbox has 2 Krakens at a 12:60 gear ratio, then a 16:16 chain link, with a driving links at
@@ -43,8 +44,9 @@ public class ElevatorSimul extends Elevator {
 
   @Override
   public void simulationPeriodic() {
-    sim.setInput(voltage);
+    sim.setInput(voltage - Elevator.kG);
     sim.update(Robot.kDefaultPeriod);
+    position = Units.metersToInches(sim.getPositionMeters());
   }
 
   @Override
@@ -64,7 +66,7 @@ public class ElevatorSimul extends Elevator {
 
   @Override
   public double getMotorPosition() {
-    return Units.metersToInches(sim.getPositionMeters());
+    return position;
   }
 
   @Override
@@ -74,7 +76,9 @@ public class ElevatorSimul extends Elevator {
 
   @Override
   public void setEncoderPosition(double position) {
-    sim.setState(Units.inchesToMeters(position), sim.getVelocityMetersPerSecond());
+    if (sim != null) {
+      sim.setState(Units.inchesToMeters(position), sim.getVelocityMetersPerSecond());
+    }
   }
 
   @Override
@@ -83,5 +87,4 @@ public class ElevatorSimul extends Elevator {
   }
 
   void updateSensor() {}
-
 }

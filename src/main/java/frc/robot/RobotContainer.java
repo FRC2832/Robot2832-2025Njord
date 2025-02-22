@@ -17,7 +17,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -35,9 +34,6 @@ import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
 import frc.robot.elevator.ElevatorHw;
 import frc.robot.elevator.ElevatorSimul;
-import frc.robot.leds.FrontLeds;
-import frc.robot.leds.RearLeds;
-import frc.robot.leds.ShowTargetInfo;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.simulation.RobotSim;
@@ -193,7 +189,7 @@ public class RobotContainer {
     // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
 
     new Trigger(() -> Math.abs(op.getElevatorRequest()) > 0.03)
-        .whileTrue(elevator.driveElevator(op::getElevatorRequest));
+        .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     elevator.setDefaultCommand(elevator.holdElevator());
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
         .whileTrue(pivot.drivePivot(op::getPivotRequest));
@@ -233,18 +229,18 @@ public class RobotContainer {
   public Command setScoringPosition(ScoringPositions position) {
     return new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
     /*
-    if (curAngle < 30 && destDist > 22) {
-        pivot out to 30
-        then
-            pid to position
-    }
-    if (curAngle > 30 && destDist < 22 && destAngle < 30){
-        drive to low position, 20 in
-        move claw/destination to position
-    }
-    if (curAngle > 30 && destAngle > 30) {
-        do old
-    }
-  */
- }
+      if (curAngle < 30 && destDist > 22) {
+          pivot out to 30
+          then
+              pid to position
+      }
+      if (curAngle > 30 && destDist < 22 && destAngle < 30){
+          drive to low position, 20 in
+          move claw/destination to position
+      }
+      if (curAngle > 30 && destAngle > 30) {
+          do old
+      }
+    */
+  }
 }
