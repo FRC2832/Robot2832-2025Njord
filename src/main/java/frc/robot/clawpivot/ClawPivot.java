@@ -31,6 +31,7 @@ public abstract class ClawPivot extends SubsystemBase {
   DoubleEntry clawPub;
 
   BooleanSubscriber pidEnableNtSub;
+  boolean collisionWarning;
 
   private HashMap<ScoringPositions, DoubleSupplier> positions;
 
@@ -60,6 +61,7 @@ public abstract class ClawPivot extends SubsystemBase {
     positions.put(ScoringPositions.NetAlgae, UtilFunctions.getSettingSub("ClawPos/NetAlgae", 135));
     positions.put(ScoringPositions.Lollipop, UtilFunctions.getSettingSub("ClawPos/Lollipop", 185));
     pidEnableNtSub = UtilFunctions.getSettingSub("ClawPivot/EnablePid", false);
+    collisionWarning = false;
   }
 
   @Override
@@ -68,8 +70,8 @@ public abstract class ClawPivot extends SubsystemBase {
     pidEnabled = pidEnableNtSub.get();
   }
 
-  public Command drivePivot(DoubleSupplier pct) {
-    return run(() -> setPower(pct.getAsDouble()));
+  public Command drivePivot(DoubleSupplier pct, DoubleSupplier elevatorHeight) {
+    return new DriveClaw(this, elevatorHeight, pct);
   }
 
   public Command setAngleCmd(Double angle) {
@@ -86,5 +88,13 @@ public abstract class ClawPivot extends SubsystemBase {
 
   public Command holdClawPivot() {
     return new HoldClawPivot(this);
+  }
+
+  public void setCollisionWarning(boolean warningOn) {
+    collisionWarning = warningOn;
+  }
+
+  public boolean getCollisionWarning() {
+    return collisionWarning;
   }
 }

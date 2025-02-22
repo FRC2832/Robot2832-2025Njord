@@ -23,32 +23,47 @@ public class DriveElevator extends Command {
 
   @Override
   public void execute() {
+    boolean canMove;
     double elevatorPos = elevator.getMotorPosition();
     double clawAngle = clawAngleSup.getAsDouble();
+    double request = driverRequest.getAsDouble();
     if ((27.3 - SAFETY_BUFFER < elevatorPos)
         && (elevatorPos < 36.5 + SAFETY_BUFFER)
         && (clawAngle < 15 + ANGLE_SAFETY)) {
       // hold elevator at position
-      elevator.setVoltage(elevator.kG);
-      // elevator.setCollisionWarning(true)
+      //  if this and the next if-statement are true, this allows it to drive up into the point that the second if-statement stops it from hitting(although thats because the safety buffers interesct, i think??? once it moves outside of this if-statement's region it should be good)
+      //canMove = (request < 0) ^ (elevatorPos > 31.9);
+      canMove = false;
     } else if ((43.7 - SAFETY_BUFFER < elevatorPos)
         && (elevatorPos < 57.2 + SAFETY_BUFFER)
         && (clawAngle < 15 + ANGLE_SAFETY)) {
-      elevator.setVoltage(elevator.kG);
+      canMove = false;
     } else if ((0 - SAFETY_BUFFER < elevatorPos)
         && (elevatorPos < 19 + SAFETY_BUFFER)
-        && (clawAngle > 120 - ANGLE_SAFETY)) {
-      elevator.setVoltage(elevator.kG);
+        && (clawAngle > 120 - ANGLE_SAFETY)) {//the angle this turns false at is way too low - Luc
+      canMove = request > 0;
     } else {
-      elevator.setVoltage((driverRequest.getAsDouble() * 12) + elevator.kG);
+      canMove = true;
     }
+    if (canMove) {
+      elevator.setVoltage((driverRequest.getAsDouble() * 12) + elevator.kG);
+    } else {
+      elevator.setVoltage(Elevator.kG);
+    }
+    elevator.setCollisionWarning(!canMove);
     // range1 = 27.3 - 36.5", 15* out
     // range2 = 43.7 - 57.2", 15* out
     // range3 = 0 - 19", 120* out
+    // elevator.setVoltage(elevator.kG);
   }
 
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    elevator.setCollisionWarning(false);
   }
 }

@@ -36,6 +36,8 @@ public abstract class Elevator extends SubsystemBase {
   boolean pidEnabled;
   DoubleEntry heightPub;
   BooleanSubscriber pidEnableNtSub;
+  boolean collisionWarning;
+
   private HashMap<ScoringPositions, DoubleSupplier> positions;
 
   public Elevator() {
@@ -69,6 +71,7 @@ public abstract class Elevator extends SubsystemBase {
         ScoringPositions.Lollipop, UtilFunctions.getSettingSub("ElevatorPos/Lollipop", 22.7));
 
     pidEnableNtSub = UtilFunctions.getSettingSub("Elevator/EnablePid", false);
+    collisionWarning = false;
   }
 
   boolean init = false;
@@ -80,7 +83,7 @@ public abstract class Elevator extends SubsystemBase {
     pidEnabled = pidEnableNtSub.get();
 
     if (!init) {
-      //TODO implement real zeroing of motor
+      // TODO implement real zeroing of motor
       setEncoderPosition(16.5);
       init = true;
       // setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
@@ -112,5 +115,13 @@ public abstract class Elevator extends SubsystemBase {
 
   public Command holdElevator() {
     return new HoldElevator(this);
+  }
+
+  public void setCollisionWarning(boolean warningOn) {
+    collisionWarning = warningOn;
+  }
+
+  public boolean getCollisionWarning() {
+    return collisionWarning;
   }
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -43,7 +44,9 @@ import frc.robot.vision.Vision;
 import java.io.File;
 import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
+import org.livoniawarriors.leds.BreathLeds;
 import org.livoniawarriors.leds.LedSubsystem;
+import org.livoniawarriors.leds.LightningFlash;
 import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
@@ -192,7 +195,7 @@ public class RobotContainer {
         .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     elevator.setDefaultCommand(elevator.holdElevator());
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
-        .whileTrue(pivot.drivePivot(op::getPivotRequest));
+        .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
     pivot.setDefaultCommand(pivot.holdClawPivot());
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
@@ -215,6 +218,12 @@ public class RobotContainer {
         .whileTrue(setScoringPosition(ScoringPositions.Lollipop));
     new Trigger(() -> op.getLoadingPositionCommand())
         .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
+
+    new Trigger(
+            () -> {
+              return elevator.getCollisionWarning() || pivot.getCollisionWarning();
+            })
+        .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
   }
 
   /**

@@ -3,6 +3,7 @@ package frc.robot.clawpivot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -21,12 +22,14 @@ public class ClawPivotHw extends ClawPivot {
     CANcoderConfiguration configuration = new CANcoderConfiguration();
     CANcoderConfigurator cfg;
     cfg = pivotAngle.getConfigurator();
-    var statusCode = cfg.refresh(configuration);
+    StatusCode statusCode = cfg.refresh(configuration);
     configuration.MagnetSensor.MagnetOffset = 0.109375;
     configuration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     statusCode = cfg.apply(configuration);
+    // stop unused warning for now
+    statusCode = (StatusCode) statusCode;
 
-    // pivotMotor.setSoftLimits(16, 80);
+    pivotMotor.setSoftLimits(4, 180);
     pivotMotor.setScaleFactor(1 / 7.649);
     pivotMotor.setCurrentLimit(10);
     pivotMotor.setBrakeMode(true);
