@@ -3,9 +3,7 @@ package org.livoniawarriors.leds;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import java.util.function.Supplier;
-
 import org.livoniawarriors.ColorHSV;
 
 /** This class shows a slow breathing pattern on the leds, slowly turning them on and off */

@@ -14,12 +14,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -223,12 +223,8 @@ public class RobotContainer {
     new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
 
-    new Trigger(this::isCollisionWarning)
-        .whileFalse(
-            new ConditionalCommand(
-                new BreathLeds(leds, Color.kYellow),
-                new BreathLeds(leds, Color.kAqua),
-                pieceTypeSwitcher::isCoral));
+    new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
+        .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
   }
 
   /**
