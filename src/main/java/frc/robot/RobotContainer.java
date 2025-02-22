@@ -47,6 +47,8 @@ import frc.robot.vision.Vision;
 import java.io.File;
 import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
+import org.livoniawarriors.leds.LedSubsystem;
+import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
 /**
@@ -59,8 +61,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private SwerveSubsystem swerveDrive;
 
-  private FrontLeds frontLeds;
-  private RearLeds rearLeds;
+  // private FrontLeds frontLeds;
+  // private RearLeds rearLeds;
+  private LedSubsystem leds;
   private Vision vision;
   private Elevator elevator;
   private ClawPivot pivot;
@@ -102,8 +105,9 @@ public class RobotContainer {
     String swerveDirectory = "swerve/njord";
     // subsystems used in all robots
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
-    frontLeds = new FrontLeds(6, 54);
-    rearLeds = new RearLeds(frontLeds);
+    // frontLeds = new FrontLeds(0, 54);
+    // rearLeds = new RearLeds(frontLeds);
+    leds = new LedSubsystem(0, 320);
     pieceTypeSwitcher = new PieceTypeSwitcher();
 
     if (Robot.isSimulation()) {
@@ -179,11 +183,13 @@ public class RobotContainer {
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
-    frontLeds.setDefaultCommand(
-        new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
-    rearLeds.setDefaultCommand(
-        new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+    leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+    // frontLeds.setDefaultCommand(
+    //    new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+    // rearLeds.setDefaultCommand(
+    //    new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+    // frontLeds.setDefaultCommand(new RainbowLeds(frontLeds));
+    // rearLeds.setDefaultCommand(new RainbowLeds(rearLeds));
     // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
 
     new Trigger(() -> Math.abs(op.getElevatorRequest()) > 0.03)
