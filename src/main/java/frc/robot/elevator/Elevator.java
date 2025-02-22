@@ -44,7 +44,7 @@ public abstract class Elevator extends SubsystemBase {
     super();
     AutoLogOutputManager.addObject(this);
     pidEnabled = false;
-    SmartDashboard.putData("Set Elevator 20", setPositionCmd(20));
+    SmartDashboard.putData("Set Elevator 30", setPositionCmd(30));
     SmartDashboard.putData("Set Elevator 70", setPositionCmd(70));
     heightPub =
         NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Height").getEntry(0);

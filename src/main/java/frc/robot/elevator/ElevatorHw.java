@@ -33,6 +33,8 @@ public class ElevatorHw extends Elevator {
   public void setPosition(double distance) {
     if (pidEnabled) {
       leftMotor.setPosition(distance);
+    } else {
+      leftMotor.stopMotor(false);
     }
   }
 
