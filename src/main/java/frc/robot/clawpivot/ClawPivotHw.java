@@ -48,7 +48,7 @@ public class ClawPivotHw extends ClawPivot {
     if (pidEnabled) {
       pivotMotor.setPosition(angle);
     } else {
-      pivotMotor.stopMotor(false);
+      pivotMotor.setVoltage(0);
     }
   }
 

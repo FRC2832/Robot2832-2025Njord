@@ -43,8 +43,8 @@ public abstract class ClawPivot extends SubsystemBase {
     AutoLogOutputManager.addObject(this);
     pidEnabled = false;
 
-    SmartDashboard.putData("Set Claw 20*", setAngleCmd(20.));
-    SmartDashboard.putData("Set Claw 170*", setAngleCmd(170.));
+    SmartDashboard.putData("Set Claw 45*", setAngleCmd(45.));
+    SmartDashboard.putData("Set Claw 120*", setAngleCmd(120.));
     clawPub =
         NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Angle").getEntry(0);
     positions = new HashMap<>();

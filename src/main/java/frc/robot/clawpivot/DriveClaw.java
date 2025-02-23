@@ -69,5 +69,6 @@ public class DriveClaw extends Command {
   @Override
   public void end(boolean interrupted) {
     clawPivot.setCollisionWarning(false);
+    clawPivot.setPower(0);
   }
 }
