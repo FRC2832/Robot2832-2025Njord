@@ -81,7 +81,7 @@ public class TalonFXMotor extends MotorControl {
 
     configuration = new TalonFXConfiguration();
     cfg = motor.getConfigurator();
-    positionSetter = new MotionMagicVoltage(0);
+    positionSetter = new MotionMagicVoltage(0).withUpdateFreqHz(1000);
     velocitySetter = new MotionMagicVelocityVoltage(0);
     rpmSetter = new VelocityVoltage(0).withSlot(1);
 
