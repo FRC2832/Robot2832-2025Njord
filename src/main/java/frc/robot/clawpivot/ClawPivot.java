@@ -78,11 +78,12 @@ public abstract class ClawPivot extends SubsystemBase {
   }
 
   public Command setAngleCmd(Double angle) {
-    return run(() -> setAngle(angle));
+    return run(() -> setAngle(angle)).until(() -> Math.abs(getAngle() - angle) < 2.);
   }
 
   public Command setAngleCmd(ScoringPositions position) {
-    return run(() -> setAngle(getSetPosition(position)));
+    return run(() -> setAngle(getSetPosition(position)))
+        .until(() -> Math.abs(getAngle() - getSetPosition(position)) < 2.);
   }
 
   public double getSetPosition(ScoringPositions position) {
