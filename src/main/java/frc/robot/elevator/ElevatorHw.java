@@ -3,12 +3,14 @@ package frc.robot.elevator;
 import au.grapplerobotics.LaserCan;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.filter.LinearFilter;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 
 public class ElevatorHw extends Elevator {
   TalonFXMotor leftMotor;
   TalonFXMotor rightMotor;
   LaserCan distSensor;
+  private LinearFilter filter;
 
   public ElevatorHw() {
     super();
@@ -22,6 +24,8 @@ public class ElevatorHw extends Elevator {
     leftMotor.setBrakeMode(true);
 
     distSensor = new LaserCan(1);
+    // filter out the noisy distance sensor
+    filter = LinearFilter.singlePoleIIR(0.16, 0.02);
 
     TalonFX leftKracken = (TalonFX) leftMotor.getBaseMotor();
     TalonFX rightKracken = (TalonFX) rightMotor.getBaseMotor();
@@ -68,6 +72,9 @@ public class ElevatorHw extends Elevator {
 
   @Override
   void updateSensor() {
-    sensorValue = distSensor.getMeasurement().distance_mm / 1000.;
+    if (distSensor.getMeasurement() != null) {
+      double measurement = distSensor.getMeasurement().distance_mm / 1000.;
+      sensorValue = filter.calculate(measurement);
+    }
   }
 }
