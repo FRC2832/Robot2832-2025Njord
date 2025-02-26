@@ -152,6 +152,7 @@ public class RobotContainer {
         "Clear Sticky Faults", new InstantCommand(MotorControls::ClearStickyFaults));
 
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
+    SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
@@ -201,6 +202,9 @@ public class RobotContainer {
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
     pivot.setDefaultCommand(pivot.holdClawPivot());
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
+    intake
+        .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
+        .whileTrue(intake.homeCoral(op::getIntakeRequest));
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
     new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())

@@ -23,7 +23,7 @@ public class OperatorControls {
   }
 
   public double getIntakeRequest() {
-    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis()) * 0.125;
+    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis());
   }
 
   public boolean getSwitchPiece() {
