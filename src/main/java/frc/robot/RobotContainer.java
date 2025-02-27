@@ -276,7 +276,7 @@ public class RobotContainer {
     Zones destZone = getZone(elevator.getSetPosition(position), pivot.getSetPosition(position));
 
     if (curZone == Zones.ZoneD) {
-      //if we start in danger zone, get out, then rerun this logic to get to the spot
+      // if we start in danger zone, get out, then rerun this logic to get to the spot
       return pivot.setAngleCmd(30).andThen(setScoringPosition(position));
     } else if (curZone == destZone) { // any zone to any zone
       return new ParallelCommandGroup(
