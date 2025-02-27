@@ -77,12 +77,13 @@ public abstract class ClawPivot extends SubsystemBase {
     return new DriveClaw(this, elevatorHeight, pct);
   }
 
-  public Command setAngleCmd(Double angle) {
-    return run(() -> setAngle(angle));
+  public Command setAngleCmd(double angle) {
+    return run(() -> setAngle(angle)).until(() -> Math.abs(getAngle() - angle) < 2.);
   }
 
   public Command setAngleCmd(ScoringPositions position) {
-    return run(() -> setAngle(getSetPosition(position)));
+    return run(() -> setAngle(getSetPosition(position)))
+        .until(() -> Math.abs(getAngle() - getSetPosition(position)) < 2.);
   }
 
   public double getSetPosition(ScoringPositions position) {
