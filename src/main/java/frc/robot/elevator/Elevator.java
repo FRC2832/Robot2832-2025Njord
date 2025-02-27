@@ -100,7 +100,8 @@ public abstract class Elevator extends SubsystemBase {
   }
 
   public Command setPositionCmd(ScoringPositions position) {
-    return run(() -> setPosition(getSetPosition(position)));
+    return run(() -> setPosition(getSetPosition(position)))
+        .until(() -> Math.abs(getSetPosition(position) - getPosition()) < 1);
   }
 
   public double getSetPosition(ScoringPositions position) {

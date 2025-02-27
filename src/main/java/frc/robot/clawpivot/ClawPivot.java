@@ -77,7 +77,7 @@ public abstract class ClawPivot extends SubsystemBase {
     return new DriveClaw(this, elevatorHeight, pct);
   }
 
-  public Command setAngleCmd(Double angle) {
+  public Command setAngleCmd(double angle) {
     return run(() -> setAngle(angle)).until(() -> Math.abs(getAngle() - angle) < 2.);
   }
 

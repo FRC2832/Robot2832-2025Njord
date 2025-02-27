@@ -271,22 +271,29 @@ public class RobotContainer {
     Zones curZone = getZone(elevator.getPosition(), pivot.getAngle());
     Zones destZone = getZone(elevator.getSetPosition(position), pivot.getSetPosition(position));
 
-    if (curZone == destZone) { // any zone to any zone
+    if (curZone == Zones.ZoneD) {
+      //if we start in danger zone, get out, then rerun this logic to get to the spot
+      return pivot.setAngleCmd(30).andThen(setScoringPosition(position));
+    } else if (curZone == destZone) { // any zone to any zone
       return new ParallelCommandGroup(
-          elevator.setPositionCmd(position), pivot.setAngleCmd(position));
+          elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
+          pivot.setAngleCmd(position).andThen(pivot.holdClawPivot()));
     } else if ((curZone == Zones.ZoneA || curZone == Zones.ZoneC)
         && destZone == Zones.ZoneB) { // (A or C) to B
       return pivot
           .setAngleCmd(45.0)
+          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
           .andThen(
               new ParallelCommandGroup(
-                  elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
+                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
+                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
     } else if ((curZone == Zones.ZoneA && destZone == Zones.ZoneC)
         || (curZone == Zones.ZoneC
             && destZone
                 == Zones.ZoneA)) { // A or C) to (A or C) [but not going from A to A or C to C]
       return pivot
           .setAngleCmd(45.0)
+          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
           .andThen(elevator.setPositionCmd(position))
           .andThen(pivot.setAngleCmd(position));
     } else if (curZone == Zones.ZoneB
