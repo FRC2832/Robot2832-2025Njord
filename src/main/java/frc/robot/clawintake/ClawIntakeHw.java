@@ -1,20 +1,22 @@
 package frc.robot.clawintake;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Millimeters;
-
 import au.grapplerobotics.LaserCan;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.math.filter.LinearFilter;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 
 public class ClawIntakeHw extends ClawIntake {
   private TalonFXMotor intakeMotor;
   private LaserCan pieceSensor;
+  private double distance;
+  private LinearFilter filter;
 
   public ClawIntakeHw() {
     super();
     intakeMotor = new TalonFXMotor("Intake", 59);
     pieceSensor = new LaserCan(2);
+
+    // filter out the noisy distance sensor
+    filter = LinearFilter.singlePoleIIR(0.06, 0.02);
   }
 
   @Override
@@ -24,12 +26,39 @@ public class ClawIntakeHw extends ClawIntake {
 
   @Override
   public boolean hasCoral() {
-    return pieceSensor.getMeasurement().distance_mm
-        < Distance.ofBaseUnits(4, Inches).in(Millimeters);
+    return 0 <= distance && distance < 80;
   }
 
   @Override
   public boolean hasAlgae() {
     return false;
+  }
+
+  @Override
+  void setVelocity(double velocity) {
+    intakeMotor.setVelocity(velocity);
+  }
+
+  @Override
+  void setPosition(double position) {
+    intakeMotor.setPosition(position);
+  }
+
+  @Override
+  double getPosition() {
+    return intakeMotor.getPosition();
+  }
+
+  @Override
+  void updateSensors() {
+    if (pieceSensor.getMeasurement() != null) {
+      var measurement = pieceSensor.getMeasurement().distance_mm;
+      distance = filter.calculate(measurement);
+    }
+  }
+
+  @Override
+  double getVelocity() {
+    return intakeMotor.getVelocity();
   }
 }
