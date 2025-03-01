@@ -1,5 +1,6 @@
 package org.livoniawarriors;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Robot;
 
 public class MotorPositionReset {
@@ -7,22 +8,35 @@ public class MotorPositionReset {
 
   private double SettleTime;
   private double SensorDifference;
+  private double MotorVelocity;
+  private double lastMotorPosition;
+  private LinearFilter filter;
 
-  public MotorPositionReset(double settleTime, double sensorDifference) {
+  public MotorPositionReset(double settleTime, double sensorDifference, double motorVelocity) {
     this.SettleTime = settleTime;
     this.SensorDifference = sensorDifference;
+    this.MotorVelocity = motorVelocity;
     timer = 0;
+    lastMotorPosition = 0;
+    // filter out the noisy distance sensor
+    filter = LinearFilter.singlePoleIIR(0.16, Robot.kDefaultPeriod);
   }
 
   /**
    * @return Returns when the reset is needed
    */
   public boolean updateReset(double motorPosition, double sensorPosition) {
-    boolean incrementTimer = false;
+    boolean incrementTimer = true;
     double lastTimer = timer;
+    double velocity = (motorPosition - lastMotorPosition) / Robot.kDefaultPeriod;
+    lastMotorPosition = motorPosition;
 
-    if (Math.abs(motorPosition - sensorPosition) > SensorDifference) {
-      incrementTimer = true;
+    if (Math.abs(motorPosition - sensorPosition) < SensorDifference) {
+      incrementTimer = false;
+    }
+
+    if (Math.abs(filter.calculate(velocity)) > MotorVelocity) {
+      incrementTimer = false;
     }
 
     if (incrementTimer) {

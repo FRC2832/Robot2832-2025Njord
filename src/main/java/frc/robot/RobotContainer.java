@@ -155,6 +155,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
     SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
+    SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
@@ -186,6 +187,8 @@ public class RobotContainer {
     driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
     driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
+
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
@@ -207,6 +210,8 @@ public class RobotContainer {
     intake
         .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
         .whileTrue(intake.homeCoral(op::getIntakeRequest));
+
+    // pid control
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
     new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())

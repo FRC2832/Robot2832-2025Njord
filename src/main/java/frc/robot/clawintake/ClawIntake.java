@@ -57,6 +57,17 @@ public abstract class ClawIntake extends SubsystemBase {
         });
   }
 
+  public Command driveIntakeFast(BooleanSupplier isCoral) {
+    return run(
+        () -> {
+          var pct = 0.65;
+          if (isCoral.getAsBoolean()) {
+            pct *= -1;
+          }
+          setPower(pct);
+        });
+  }
+
   public Trigger trigCoralHome(DoubleSupplier driveCommand, BooleanSupplier isCoral) {
     // if we see a coral and need to home
     return new Trigger(

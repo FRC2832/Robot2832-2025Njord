@@ -77,7 +77,7 @@ public abstract class Elevator extends SubsystemBase {
 
     pidEnableNtSub = UtilFunctions.getSettingSub("Elevator/EnablePid", false);
     collisionWarning = false;
-    positionReset = new MotorPositionReset(0.5, 0.5);
+    positionReset = new MotorPositionReset(1, 0.5, 0.5);
   }
 
   @Override
@@ -89,7 +89,7 @@ public abstract class Elevator extends SubsystemBase {
     double distance = OFFSET + Meter.of(getDistanceSensor()).in(Inches);
 
     // check if sensor is near the bottom to do the reset
-    if (distance < 30) {
+    if ((15 < distance) && (distance < 30)) {
       if (positionReset.updateReset(getMotorPosition(), distance)) {
         // it is time to reset
         setEncoderPosition(distance);
@@ -125,6 +125,10 @@ public abstract class Elevator extends SubsystemBase {
 
   public Command holdElevator() {
     return new HoldElevator(this);
+  }
+
+  public Command resetElevator() {
+    return runOnce(() -> setEncoderPosition(16.5));
   }
 
   public void setCollisionWarning(boolean warningOn) {
