@@ -14,19 +14,16 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
 import frc.robot.clawintake.ClawIntakeHw;
@@ -53,7 +50,6 @@ import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
 import org.livoniawarriors.leds.LedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
-import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
 /**
@@ -194,7 +190,7 @@ public class RobotContainer {
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
     // frontLeds.setDefaultCommand(
     //    new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
     // rearLeds.setDefaultCommand(
@@ -238,9 +234,10 @@ public class RobotContainer {
 
     new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
-    //RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
-    new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
-        .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    // RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
+    // new Trigger(() -> Robot.robotIsTeleop() && (isCollisionWarning() == false))
+    //    .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
     /*
     new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
         .whileTrue(new BreathLeds(leds, Color.kMagenta));
@@ -252,7 +249,7 @@ public class RobotContainer {
         this::isCollisionWarning
     ));
     */
-    
+
   }
 
   /**
