@@ -18,6 +18,7 @@ public class ClawIntakeSim extends ClawIntake {
   @AutoLogOutput double linearSpeed_mps;
   double shot_speed_mps;
 
+  // TODO change to 12:56
   // The intake has 12:30 belt pullys, then 1:1 throughout the rest, wheels are 2" OD
   // estimation from recalc
   // https://www.reca.lc/flywheel?currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=100&flywheelMomentOfInertia=%7B%22s%22%3A0%2C%22u%22%3A%22in2%2Albs%22%7D&flywheelRadius=%7B%22s%22%3A2%2C%22u%22%3A%22in%22%7D&flywheelRatio=%7B%22magnitude%22%3A1%2C%22ratioType%22%3A%22Reduction%22%7D&flywheelWeight=%7B%22s%22%3A0%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%20%28FOC%29%2A%22%7D&motorRatio=%7B%22magnitude%22%3A2.5%2C%22ratioType%22%3A%22Reduction%22%7D&projectileRadius=%7B%22s%22%3A2%2C%22u%22%3A%22in%22%7D&projectileWeight=%7B%22s%22%3A1.2%2C%22u%22%3A%22lbs%22%7D&shooterMomentOfInertia=%7B%22s%22%3A4.5%2C%22u%22%3A%22in2%2Albs%22%7D&shooterRadius=%7B%22s%22%3A3%2C%22u%22%3A%22in%22%7D&shooterTargetSpeed=%7B%22s%22%3A900%2C%22u%22%3A%22rpm%22%7D&shooterWeight=%7B%22s%22%3A1%2C%22u%22%3A%22lbs%22%7D&useCustomFlywheelMoi=0&useCustomShooterMoi=0
@@ -52,5 +53,32 @@ public class ClawIntakeSim extends ClawIntake {
   @Override
   public boolean hasAlgae() {
     return false;
+  }
+
+  @Override
+  void setVelocity(double velocity) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
+  }
+
+  @Override
+  void setPosition(double position) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setPosition'");
+  }
+
+  @Override
+  double getPosition() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+  }
+
+  @Override
+  void updateSensors() {}
+
+  @Override
+  double getVelocity() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getVelocity'");
   }
 }

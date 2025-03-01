@@ -19,11 +19,11 @@ public class OperatorControls {
   }
 
   public double getPivotRequest() {
-    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.25;
+    return -UtilFunctions.deadband(operator.getRightY(), opDeadband.get()) * 0.16;
   }
 
   public double getIntakeRequest() {
-    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis()) * 0.25;
+    return (operator.getRightTriggerAxis() - operator.getLeftTriggerAxis());
   }
 
   public boolean getSwitchPiece() {
@@ -56,5 +56,9 @@ public class OperatorControls {
 
   public Trigger getSwitchPieceTrigger() {
     return new Trigger(this::getSwitchPiece);
+  }
+
+  public Trigger getFastIntake() {
+    return new Trigger(operator::getStartButton);
   }
 }

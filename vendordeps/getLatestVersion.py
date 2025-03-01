@@ -31,16 +31,15 @@ for fileName in files:
             try:
                 with urllib.request.urlopen(fullPath) as response:
                     xmlString = response.read()
+                tree = ET.fromstring(xmlString)
+                latest = tree.find("versioning/latest")
+                release = tree.find("versioning/release")
+                modify = tree.find("versioning/lastUpdated")
+                if depend['version'] != release.text:
+                    modified = "(Modified) "
+                else:
+                    modified = ""
+                print(f"{modified}{depend['artifactId']} Current: {depend['version']} Latest: {latest.text} Release: {release.text} Last Modified: {modify.text}")
             except:
                 print(f"Error retrieving {fullPath}")
                 continue
-
-            tree = ET.fromstring(xmlString)
-            latest = tree.find("versioning/latest")
-            release = tree.find("versioning/release")
-            modify = tree.find("versioning/lastUpdated")
-            if depend['version'] != release.text:
-                modified = "(Modified) "
-            else:
-                modified = ""
-            print(f"{modified}{depend['artifactId']} Current: {depend['version']} Latest: {latest.text} Release: {release.text} Last Modified: {modify.text}")

@@ -7,7 +7,9 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.MathUtil;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 
 public class ClawPivotHw extends ClawPivot {
@@ -46,12 +48,15 @@ public class ClawPivotHw extends ClawPivot {
   void setAngle(double angle) {
     if (pidEnabled) {
       pivotMotor.setPosition(angle);
+    } else {
+      pivotMotor.setVoltage(0);
     }
   }
 
   @Override
   public double getSensorAngle() {
-    return Rotations.of(pivotAngle.getPosition().getValueAsDouble()).in(Degrees);
+    var degrees = Rotations.of(pivotAngle.getPosition().getValueAsDouble()).in(Degrees);
+    return MathUtil.inputModulus(degrees, -60, 300);
   }
 
   @Override
@@ -62,5 +67,10 @@ public class ClawPivotHw extends ClawPivot {
   @Override
   void setEncoderPosition(double position) {
     pivotMotor.setEncoderPosition(position);
+  }
+
+  @Override
+  TalonFX getMotor() {
+    return (TalonFX) pivotMotor.getBaseMotor();
   }
 }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -33,6 +34,7 @@ import frc.robot.clawintake.ClawIntakeSim;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
 import frc.robot.clawpivot.ClawPivotSim;
+import frc.robot.clawpivot.PlaySong;
 import frc.robot.controllers.DriverControls;
 import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
@@ -45,6 +47,7 @@ import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
 import java.io.File;
+import java.util.Set;
 import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
@@ -121,7 +124,7 @@ public class RobotContainer {
       elevator = new ElevatorSimul();
       pivot = new ClawPivotSim();
     } else {
-      swerveDrive.setMaximumSpeed(1, Math.PI / 2);
+      swerveDrive.setMaximumSpeed(3, Math.toRadians(220));
       intake = new ClawIntakeHw();
       elevator = new ElevatorHw();
       pivot = new ClawPivotHw();
@@ -153,6 +156,10 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Clear Sticky Faults", new InstantCommand(MotorControls::ClearStickyFaults));
 
+    SmartDashboard.putData("Play Song", new PlaySong(pivot));
+    SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
+    SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
+
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
@@ -183,6 +190,8 @@ public class RobotContainer {
     driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
     driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
+
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
@@ -201,6 +210,11 @@ public class RobotContainer {
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
     pivot.setDefaultCommand(pivot.holdClawPivot());
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
+    intake
+        .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
+        .whileTrue(intake.homeCoral(op::getIntakeRequest));
+
+    // pid control
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));
     new Trigger(() -> op.getL2Command() && pieceTypeSwitcher.isCoral())
@@ -254,21 +268,70 @@ public class RobotContainer {
     return elevator.getCollisionWarning() || pivot.getCollisionWarning();
   }
 
-  public Command setScoringPosition(ScoringPositions position) {
-    return new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
-    /*
-      if (curAngle < 30 && destDist > 22) {
-          pivot out to 30
-          then
-              pid to position
-      }
-      if (curAngle > 30 && destDist < 22 && destAngle < 30){
-          drive to low position, 20 in
-          move claw/destination to position
-      }
-      if (curAngle > 30 && destAngle > 30) {
-          do old
-      }
-    */
+  enum Zones {
+    ZoneA,
+    ZoneB,
+    ZoneC,
+    ZoneD
+  }
+
+  private Zones getZone(double height, double angle) {
+    // Zone A - dist < 27.3 && angle < 15 (intake area)
+    // Zone B - angle > 15 (everything on the scoring side)
+    // Zone C - dist > 57.2 && angle < 15 (algae scoring)
+    // Zone D - 27.3 < dist < 57.2 && angle < 15 (bad!!!)
+    if (angle > 15.0) {
+      return Zones.ZoneB;
+    } else if (height < 27.3) {
+      return Zones.ZoneA;
+    } else if (height > 57.2) {
+      return Zones.ZoneC;
+    } else {
+      return Zones.ZoneD;
+    }
+  }
+
+  private Command setScoringPosition(ScoringPositions position) {
+    return new DeferredCommand(() -> setScoringPositionDeferred(position), Set.of(elevator, pivot));
+  }
+
+  private Command setScoringPositionDeferred(ScoringPositions position) {
+    Zones curZone = getZone(elevator.getPosition(), pivot.getAngle());
+    Zones destZone = getZone(elevator.getSetPosition(position), pivot.getSetPosition(position));
+
+    if (curZone == Zones.ZoneD) {
+      // if we start in danger zone, get out, then rerun this logic to get to the spot
+      return pivot.setAngleCmd(30).andThen(setScoringPosition(position));
+    } else if (curZone == destZone) { // any zone to any zone
+      return new ParallelCommandGroup(
+          elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
+          pivot.setAngleCmd(position).andThen(pivot.holdClawPivot()));
+    } else if ((curZone == Zones.ZoneA || curZone == Zones.ZoneC)
+        && destZone == Zones.ZoneB) { // (A or C) to B
+      return pivot
+          .setAngleCmd(45.0)
+          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+          .andThen(
+              new ParallelCommandGroup(
+                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
+                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
+    } else if ((curZone == Zones.ZoneA && destZone == Zones.ZoneC)
+        || (curZone == Zones.ZoneC
+            && destZone
+                == Zones.ZoneA)) { // A or C) to (A or C) [but not going from A to A or C to C]
+      return pivot
+          .setAngleCmd(45.0)
+          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+          .andThen(elevator.setPositionCmd(position))
+          .andThen(pivot.setAngleCmd(position));
+    } else if (curZone == Zones.ZoneB
+        && (destZone == Zones.ZoneA || destZone == Zones.ZoneC)) { // B to (A or C)
+      return elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
+      // drive to low position, 20 in
+      // move claw/destination to position
+    } else { // scary...
+      return new LightningFlash(leds, Color.kLavenderBlush)
+          .andThen(new BreathLeds(leds, Color.kLavender));
+    }
   }
 }

@@ -1,5 +1,8 @@
 package frc.robot.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -11,6 +14,7 @@ import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.livoniawarriors.MotorPositionReset;
 import org.livoniawarriors.UtilFunctions;
 
 public abstract class Elevator extends SubsystemBase {
@@ -37,6 +41,7 @@ public abstract class Elevator extends SubsystemBase {
   DoubleEntry heightPub;
   BooleanSubscriber pidEnableNtSub;
   boolean collisionWarning;
+  MotorPositionReset positionReset;
 
   private HashMap<ScoringPositions, DoubleSupplier> positions;
 
@@ -44,7 +49,7 @@ public abstract class Elevator extends SubsystemBase {
     super();
     AutoLogOutputManager.addObject(this);
     pidEnabled = false;
-    SmartDashboard.putData("Set Elevator 20", setPositionCmd(20));
+    SmartDashboard.putData("Set Elevator 30", setPositionCmd(30));
     SmartDashboard.putData("Set Elevator 70", setPositionCmd(70));
     heightPub =
         NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Height").getEntry(0);
@@ -72,9 +77,8 @@ public abstract class Elevator extends SubsystemBase {
 
     pidEnableNtSub = UtilFunctions.getSettingSub("Elevator/EnablePid", false);
     collisionWarning = false;
+    positionReset = new MotorPositionReset(1, 0.5, 0.5);
   }
-
-  boolean init = false;
 
   @Override
   public void periodic() {
@@ -82,12 +86,17 @@ public abstract class Elevator extends SubsystemBase {
     heightPub.set(getPosition());
     pidEnabled = pidEnableNtSub.get();
 
-    if (!init) {
-      // TODO implement real zeroing of motor
-      setEncoderPosition(16.5);
-      init = true;
-      // setEncoderPosition(16.5 - OFFSET - Meter.of(getDistanceSensor()).in(Inches));
+    double distance = OFFSET + Meter.of(getDistanceSensor()).in(Inches);
 
+    // check if sensor is near the bottom to do the reset
+    if ((15 < distance) && (distance < 30)) {
+      if (positionReset.updateReset(getMotorPosition(), distance)) {
+        // it is time to reset
+        setEncoderPosition(distance);
+      }
+    } else {
+      // elevator is up, reset timer
+      positionReset.resetTimer();
     }
   }
 
@@ -100,7 +109,8 @@ public abstract class Elevator extends SubsystemBase {
   }
 
   public Command setPositionCmd(ScoringPositions position) {
-    return run(() -> setPosition(getSetPosition(position)));
+    return run(() -> setPosition(getSetPosition(position)))
+        .until(() -> Math.abs(getSetPosition(position) - getPosition()) < 1);
   }
 
   public double getSetPosition(ScoringPositions position) {
@@ -115,6 +125,10 @@ public abstract class Elevator extends SubsystemBase {
 
   public Command holdElevator() {
     return new HoldElevator(this);
+  }
+
+  public Command resetElevator() {
+    return runOnce(() -> setEncoderPosition(16.5));
   }
 
   public void setCollisionWarning(boolean warningOn) {

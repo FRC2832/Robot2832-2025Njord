@@ -1,5 +1,6 @@
 package frc.robot.clawpivot;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -19,6 +20,8 @@ public abstract class ClawPivot extends SubsystemBase {
   abstract void setPower(double power);
 
   abstract void setAngle(double angle);
+
+  abstract TalonFX getMotor();
 
   @AutoLogOutput
   public abstract double getSensorAngle();
@@ -40,8 +43,8 @@ public abstract class ClawPivot extends SubsystemBase {
     AutoLogOutputManager.addObject(this);
     pidEnabled = false;
 
-    SmartDashboard.putData("Set Claw 20*", setAngleCmd(20.));
-    SmartDashboard.putData("Set Claw 170*", setAngleCmd(170.));
+    SmartDashboard.putData("Set Claw 45*", setAngleCmd(45.));
+    SmartDashboard.putData("Set Claw 120*", setAngleCmd(120.));
     clawPub =
         NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Angle").getEntry(0);
     positions = new HashMap<>();
@@ -74,12 +77,13 @@ public abstract class ClawPivot extends SubsystemBase {
     return new DriveClaw(this, elevatorHeight, pct);
   }
 
-  public Command setAngleCmd(Double angle) {
-    return run(() -> setAngle(angle));
+  public Command setAngleCmd(double angle) {
+    return run(() -> setAngle(angle)).until(() -> Math.abs(getAngle() - angle) < 2.);
   }
 
   public Command setAngleCmd(ScoringPositions position) {
-    return run(() -> setAngle(getSetPosition(position)));
+    return run(() -> setAngle(getSetPosition(position)))
+        .until(() -> Math.abs(getAngle() - getSetPosition(position)) < 2.);
   }
 
   public double getSetPosition(ScoringPositions position) {

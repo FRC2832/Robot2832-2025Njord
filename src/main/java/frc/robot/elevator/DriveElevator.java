@@ -31,8 +31,11 @@ public class DriveElevator extends Command {
         && (elevatorPos < 36.5 + SAFETY_BUFFER)
         && (clawAngle < 15 + ANGLE_SAFETY)) {
       // hold elevator at position
-      //  if this and the next if-statement are true, this allows it to drive up into the point that the second if-statement stops it from hitting(although thats because the safety buffers interesct, i think??? once it moves outside of this if-statement's region it should be good)
-      //canMove = (request < 0) ^ (elevatorPos > 31.9);
+      //  if this and the next if-statement are true, this allows it to drive up into the point that
+      // the second if-statement stops it from hitting(although thats because the safety buffers
+      // interesct, i think??? once it moves outside of this if-statement's region it should be
+      // good)
+      // canMove = (request < 0) ^ (elevatorPos > 31.9);
       canMove = false;
     } else if ((43.7 - SAFETY_BUFFER < elevatorPos)
         && (elevatorPos < 57.2 + SAFETY_BUFFER)
@@ -40,13 +43,15 @@ public class DriveElevator extends Command {
       canMove = false;
     } else if ((0 - SAFETY_BUFFER < elevatorPos)
         && (elevatorPos < 19 + SAFETY_BUFFER)
-        && (clawAngle > 120 - ANGLE_SAFETY)) {//the angle this turns false at is way too low - Luc
+        && (clawAngle
+            > 120 - ANGLE_SAFETY)) { // the angle this turns true at is way too low, increase pls -
+      // Luc
       canMove = request > 0;
     } else {
       canMove = true;
     }
     if (canMove) {
-      elevator.setVoltage((driverRequest.getAsDouble() * 12) + elevator.kG);
+      elevator.setVoltage((driverRequest.getAsDouble() * 12));
     } else {
       elevator.setVoltage(Elevator.kG);
     }
