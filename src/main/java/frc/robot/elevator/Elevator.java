@@ -138,4 +138,6 @@ public abstract class Elevator extends SubsystemBase {
   public boolean getCollisionWarning() {
     return collisionWarning;
   }
+
+  protected abstract double getVelocity();
 }

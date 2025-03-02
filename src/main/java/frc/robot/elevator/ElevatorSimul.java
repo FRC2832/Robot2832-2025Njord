@@ -87,4 +87,9 @@ public class ElevatorSimul extends Elevator {
   }
 
   void updateSensor() {}
+
+  @Override
+  protected double getVelocity() {
+    return 0;
+  }
 }

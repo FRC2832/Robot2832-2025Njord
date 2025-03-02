@@ -7,8 +7,8 @@ public class DriveClaw extends Command {
   private ClawPivot clawPivot;
   private DoubleSupplier elevatorHDoubleSupplier;
   private DoubleSupplier driverRequest;
-  final double SAFETY_BUFFER = 6;
-  final double ANGLE_SAFETY = 10;
+  final double SAFETY_BUFFER = 2;
+  final double ANGLE_SAFETY = 2;
 
   public DriveClaw(
       ClawPivot clawPivot, DoubleSupplier elevatorHDoubleSupplier, DoubleSupplier driverRequest) {

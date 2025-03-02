@@ -7,8 +7,8 @@ public class DriveElevator extends Command {
   private Elevator elevator;
   private DoubleSupplier clawAngleSup;
   private DoubleSupplier driverRequest;
-  final double SAFETY_BUFFER = 6;
-  final double ANGLE_SAFETY = 10;
+  final double SAFETY_BUFFER = 2;
+  final double ANGLE_SAFETY = 2;
 
   public DriveElevator(
       Elevator elevator, DoubleSupplier clawAngleSup, DoubleSupplier driverRequest) {

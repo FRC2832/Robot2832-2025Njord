@@ -305,11 +305,18 @@ public class RobotContainer {
           .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
           .andThen(elevator.setPositionCmd(position))
           .andThen(pivot.setAngleCmd(position));
-    } else if (curZone == Zones.ZoneB
-        && (destZone == Zones.ZoneA || destZone == Zones.ZoneC)) { // B to (A or C)
+    } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneC) { // B to C
       return elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
       // drive to low position, 20 in
       // move claw/destination to position
+    } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneA) { // B to A
+      return elevator
+          .setPositionCmd(position)
+          .until(() -> elevator.getMotorPosition() < 27)
+          .andThen(
+              new ParallelCommandGroup(
+                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
+                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
     } else { // scary...
       return new LightningFlash(leds, Color.kLavenderBlush)
           .andThen(new BreathLeds(leds, Color.kLavender));
