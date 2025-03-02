@@ -74,6 +74,9 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
+  private AprilTagCamera backCamera;
+  private AprilTagCamera leftCamera;
+  private AprilTagCamera rightCamera;
 
   public final String CTRE_CAN_BUS = "Njord";
   private final String[] PDP_CHANNEL_NAMES = {
@@ -130,13 +133,51 @@ public class RobotContainer {
     vision = new Vision(swerveDrive);
     frontCamera =
         new AprilTagCamera(
-            "front",
-            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
-            new Translation3d(0.363, 0, 0.31),
+            "Front",
+            new Rotation3d(0, -Units.degreesToRadians(22), Math.toRadians(0)),
+            new Translation3d(
+                Units.inchesToMeters(5.75),
+                Units.inchesToMeters(-13.125),
+                Units.inchesToMeters(38.25)),
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    // vision.addCamera(frontCamera);
+    backCamera =
+        new AprilTagCamera(
+            "Back",
+            new Rotation3d(0, -Units.degreesToRadians(18), Math.toRadians(180)),
+            new Translation3d(
+                Units.inchesToMeters(-0.75),
+                Units.inchesToMeters(-13.125),
+                Units.inchesToMeters(38.25)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    leftCamera =
+        new AprilTagCamera(
+            "Left",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(-45)),
+            new Translation3d(
+                Units.inchesToMeters(13.25), Units.inchesToMeters(10.5), Units.inchesToMeters(8.5)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    rightCamera =
+        new AprilTagCamera(
+            "Right",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(45)),
+            new Translation3d(
+                Units.inchesToMeters(13.25),
+                Units.inchesToMeters(-10.5),
+                Units.inchesToMeters(8.5)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    vision.addCamera(frontCamera);
+    vision.addCamera(backCamera);
+    vision.addCamera(leftCamera);
+    vision.addCamera(rightCamera);
+    
     // add some buttons to press for development
     SmartDashboard.putData(
         "Fine Drive to Pose",

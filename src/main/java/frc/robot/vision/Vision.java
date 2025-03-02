@@ -13,6 +13,9 @@ import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.livoniawarriors.UtilFunctions;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.VisionSystemSim;
@@ -37,9 +40,13 @@ public class Vision extends SubsystemBase {
 
   private ArrayList<AprilTagCamera> cameras;
 
+  @AutoLogOutput double distTo12;
+  @AutoLogOutput double distTo18;
+
   public Vision(SwerveSubsystem swerve) {
     // register this subsystem with the command scheduler to have the periodic function called
     super();
+    AutoLogOutputManager.addObject(this);
     this.swerve = swerve;
     init();
   }
@@ -103,6 +110,11 @@ public class Vision extends SubsystemBase {
             pose.estimatedPose.toPose2d(), pose.timestampSeconds, c.curStdDevs);
       }
     }
+
+    distTo12 =
+        UtilFunctions.getDistance(swerve.getPose(), fieldLayout.getTagPose(12).get().toPose2d());
+    distTo18 =
+        UtilFunctions.getDistance(swerve.getPose(), fieldLayout.getTagPose(18).get().toPose2d());
   }
 
   /**
