@@ -173,8 +173,8 @@ public class RobotContainer {
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    vision.addCamera(frontCamera);
-    vision.addCamera(backCamera);
+    // vision.addCamera(frontCamera);
+    // vision.addCamera(backCamera);
     vision.addCamera(leftCamera);
     vision.addCamera(rightCamera);
 
@@ -239,7 +239,7 @@ public class RobotContainer {
 
     driver.getSwerveLockTrigger().whileTrue(swerveDrive.swerveLock());
     driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
-    driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    // driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
 
@@ -289,6 +289,7 @@ public class RobotContainer {
 
     new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
+
     // RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
     // new Trigger(() -> Robot.robotIsTeleop() && (isCollisionWarning() == false))
     //    .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
@@ -362,9 +363,8 @@ public class RobotContainer {
     } else if ((curZone == Zones.ZoneA || curZone == Zones.ZoneC)
         && destZone == Zones.ZoneB) { // (A or C) to B
       result =
-          pivot
-              .setAngleCmd(45.0)
-              .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+          new ParallelCommandGroup(elevator.setPositionCmd(27), pivot.setAngleCmd(position))
+              .until(() -> pivot.getAngle() > 15) // continue once we have cleared enough
               .andThen(
                   new ParallelCommandGroup(
                       elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
@@ -384,8 +384,7 @@ public class RobotContainer {
       // move claw/destination to position
     } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneA) { // B to A
       result =
-          elevator
-              .setPositionCmd(position)
+          new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(20))
               .until(() -> elevator.getMotorPosition() < 27)
               .andThen(
                   new ParallelCommandGroup(
