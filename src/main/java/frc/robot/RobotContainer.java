@@ -50,7 +50,6 @@ import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
 import org.livoniawarriors.leds.LedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
-import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
 /**
@@ -242,7 +241,7 @@ public class RobotContainer {
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
     // frontLeds.setDefaultCommand(
     //    new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
     // rearLeds.setDefaultCommand(
@@ -284,11 +283,24 @@ public class RobotContainer {
     new Trigger(() -> op.getLoadingPositionCommand())
         .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
 
-    new Trigger(
-            () -> {
-              return elevator.getCollisionWarning() || pivot.getCollisionWarning();
-            })
+    new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
+    // RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
+    // new Trigger(() -> Robot.robotIsTeleop() && (isCollisionWarning() == false))
+    //    .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    /*
+    new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
+        .whileTrue(new BreathLeds(leds, Color.kMagenta));
+    */
+    /*
+    RobotModeTriggers.teleop().whileTrue(new ConditionalCommand(
+        new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)),
+        new BreathLeds(leds, pieceTypeSwitcher::getPieceColor),
+        this::isCollisionWarning
+    ));
+    */
+
   }
 
   /**
@@ -298,6 +310,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public boolean isCollisionWarning() {
+    return elevator.getCollisionWarning() || pivot.getCollisionWarning();
   }
 
   enum Zones {
