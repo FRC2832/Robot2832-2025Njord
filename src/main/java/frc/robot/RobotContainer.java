@@ -177,7 +177,7 @@ public class RobotContainer {
     vision.addCamera(backCamera);
     vision.addCamera(leftCamera);
     vision.addCamera(rightCamera);
-    
+
     // add some buttons to press for development
     SmartDashboard.putData(
         "Fine Drive to Pose",
@@ -186,6 +186,14 @@ public class RobotContainer {
     // Register Named Commands for PathPlanner
     NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
     NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
+    NamedCommands.registerCommand("LoadFromHP", LoadFromHp());
+    NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
+    NamedCommands.registerCommand(
+        "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
+    NamedCommands.registerCommand(
+        "ScoreCoral",
+        new WaitCommand(0.5).andThen(intake.driveIntake(() -> 1, () -> true).withTimeout(1)));
+    NamedCommands.registerCommand("HomeCoral", intake.homeCoral(() -> 0));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -197,6 +205,8 @@ public class RobotContainer {
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
     SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
     SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
+
+    SmartDashboard.putData("Auto Test HP Load", LoadFromHp());
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
@@ -321,46 +331,55 @@ public class RobotContainer {
     Zones curZone = getZone(elevator.getPosition(), pivot.getAngle());
     Zones destZone = getZone(elevator.getSetPosition(position), pivot.getSetPosition(position));
 
+    Command result;
+
     if (curZone == Zones.ZoneD) {
       // if we start in danger zone, get out, then rerun this logic to get to the spot
-      return pivot.setAngleCmd(30).andThen(setScoringPosition(position));
+      result = pivot.setAngleCmd(30).andThen(setScoringPosition(position));
     } else if (curZone == destZone) { // any zone to any zone
-      return new ParallelCommandGroup(
-          elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
-          pivot.setAngleCmd(position).andThen(pivot.holdClawPivot()));
+      result =
+          new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
     } else if ((curZone == Zones.ZoneA || curZone == Zones.ZoneC)
         && destZone == Zones.ZoneB) { // (A or C) to B
-      return pivot
-          .setAngleCmd(45.0)
-          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
-          .andThen(
-              new ParallelCommandGroup(
-                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
-                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
+      result =
+          pivot
+              .setAngleCmd(45.0)
+              .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+              .andThen(
+                  new ParallelCommandGroup(
+                      elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
     } else if ((curZone == Zones.ZoneA && destZone == Zones.ZoneC)
         || (curZone == Zones.ZoneC
             && destZone
                 == Zones.ZoneA)) { // A or C) to (A or C) [but not going from A to A or C to C]
-      return pivot
-          .setAngleCmd(45.0)
-          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
-          .andThen(elevator.setPositionCmd(position))
-          .andThen(pivot.setAngleCmd(position));
+      result =
+          pivot
+              .setAngleCmd(45.0)
+              .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+              .andThen(elevator.setPositionCmd(position))
+              .andThen(pivot.setAngleCmd(position));
     } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneC) { // B to C
-      return elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
+      result = elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
       // drive to low position, 20 in
       // move claw/destination to position
     } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneA) { // B to A
-      return elevator
-          .setPositionCmd(position)
-          .until(() -> elevator.getMotorPosition() < 27)
-          .andThen(
-              new ParallelCommandGroup(
-                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
-                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
+      result =
+          elevator
+              .setPositionCmd(position)
+              .until(() -> elevator.getMotorPosition() < 27)
+              .andThen(
+                  new ParallelCommandGroup(
+                      elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
     } else { // scary...
-      return new LightningFlash(leds, Color.kLavenderBlush)
-          .andThen(new BreathLeds(leds, Color.kLavender));
+      result =
+          new LightningFlash(leds, Color.kLavenderBlush)
+              .andThen(new BreathLeds(leds, Color.kLavender));
     }
+
+    return result;
+  }
+
+  private Command LoadFromHp() {
+    return intake.driveIntake(() -> 1, () -> true).until(intake::hasCoral);
   }
 }
