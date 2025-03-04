@@ -40,6 +40,7 @@ import frc.robot.elevator.ElevatorSimul;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.simulation.RobotSim;
+import frc.robot.swervedrive.AlignToPose;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
@@ -206,6 +207,9 @@ public class RobotContainer {
     SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
 
     SmartDashboard.putData("Auto Test HP Load", LoadFromHp());
+    SmartDashboard.putData(
+        "Drive to Pose",
+        new AlignToPose(swerveDrive, new Pose2d(2, 2, Rotation2d.fromDegrees(60))));
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
