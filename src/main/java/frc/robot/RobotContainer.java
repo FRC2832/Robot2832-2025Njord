@@ -123,7 +123,7 @@ public class RobotContainer {
       elevator = new ElevatorSimul();
       pivot = new ClawPivotSim();
     } else {
-      swerveDrive.setMaximumSpeed(3, Math.toRadians(220));
+      swerveDrive.setMaximumSpeed(5, Math.toRadians(220));
       intake = new ClawIntakeHw();
       elevator = new ElevatorHw();
       pivot = new ClawPivotHw();

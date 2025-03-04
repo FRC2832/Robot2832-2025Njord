@@ -10,7 +10,10 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
+import swervelib.math.Matter;
 
 // you cannot pass in an array of components, each component must be independent.
 public class RobotSim implements Runnable {
@@ -26,6 +29,7 @@ public class RobotSim implements Runnable {
   DoubleEntry clawSub;
   DoubleEntry testX, testY, testZ, testRoll, testPitch, testYaw;
   Supplier<Pose2d> driveSupplier;
+  static List<Matter> matter;
   // this is the height where the claw pivot sits at rest
   static final double INITIAL_HEIGHT = 16.625;
 
@@ -127,6 +131,10 @@ public class RobotSim implements Runnable {
     // rotate coral in relation to the robot
     coral = rotateAround(coral, drivePose.getTranslation(), drivePose.getRotation());
     coralPub.set(new Pose3d[] {coral});
+
+    matter = new ArrayList<Matter>();
+    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 57));
+    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 3));
   }
 
   /**
@@ -141,5 +149,9 @@ public class RobotSim implements Runnable {
     return new Pose3d(
         currentPose.getTranslation().rotateAround(point, rot),
         currentPose.getRotation().rotateBy(rot));
+  }
+
+  public static List<Matter> getRobotMatter() {
+    return matter;
   }
 }

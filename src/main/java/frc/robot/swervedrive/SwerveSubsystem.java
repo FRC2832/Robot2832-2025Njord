@@ -42,6 +42,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.Robot;
+import frc.robot.simulation.RobotSim;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -486,6 +488,15 @@ public class SwerveSubsystem extends SubsystemBase {
                   translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip);
           var rotation =
               angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity();
+          translation =
+              SwerveMath.limitVelocity(
+                  translation,
+                  swerveDrive.getFieldVelocity().plus(new ChassisSpeeds(0.0, 0.0001, 0)),
+                  swerveDrive.getPose(),
+                  Robot.kDefaultPeriod,
+                  59,
+                  RobotSim.getRobotMatter(),
+                  swerveDrive.swerveDriveConfiguration);
           ChassisSpeeds velocity =
               new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
           var heading = swerveDrive.getOdometryHeading();
