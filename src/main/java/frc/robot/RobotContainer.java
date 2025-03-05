@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
@@ -137,11 +136,11 @@ public class RobotContainer {
     frontCamera =
         new AprilTagCamera(
             "Front",
-            new Rotation3d(0, -Units.degreesToRadians(22), Math.toRadians(0)),
+            new Rotation3d(0, -Units.degreesToRadians(21), Math.toRadians(0)),
             new Translation3d(
-                Units.inchesToMeters(5.75),
+                Units.inchesToMeters(5.375),
                 Units.inchesToMeters(-13.125),
-                Units.inchesToMeters(38.25)),
+                Units.inchesToMeters(39.75)),
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
@@ -150,9 +149,9 @@ public class RobotContainer {
             "Back",
             new Rotation3d(0, -Units.degreesToRadians(18), Math.toRadians(180)),
             new Translation3d(
-                Units.inchesToMeters(-0.75),
+                Units.inchesToMeters(-1.125),
                 Units.inchesToMeters(-13.125),
-                Units.inchesToMeters(38.25)),
+                Units.inchesToMeters(39.375)),
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
@@ -176,26 +175,22 @@ public class RobotContainer {
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    // vision.addCamera(frontCamera);
+    vision.addCamera(frontCamera);
     // vision.addCamera(backCamera);
     vision.addCamera(leftCamera);
     vision.addCamera(rightCamera);
 
     // add some buttons to press for development
-    SmartDashboard.putData(
-        "Fine Drive to Pose",
-        swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
 
     // Register Named Commands for PathPlanner
-    NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
-    NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
     NamedCommands.registerCommand("LoadFromHP", LoadFromHp());
     NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
     NamedCommands.registerCommand(
+        "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
+    NamedCommands.registerCommand(
         "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
-        "ScoreCoral",
-        new WaitCommand(0.5).andThen(intake.driveIntake(() -> 1, () -> true).withTimeout(1)));
+        "ScoreCoral", intake.driveIntake(() -> 1, () -> true).withTimeout(1));
     NamedCommands.registerCommand("HomeCoral", intake.homeCoral(() -> 0));
     NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));
     NamedCommands.registerCommand("FineDriveD", swerveDrive.alignToPoleDeferred(Poles.PoleD));
@@ -373,7 +368,7 @@ public class RobotContainer {
         && destZone == Zones.ZoneB) { // (A or C) to B
       result =
           new ParallelCommandGroup(elevator.setPositionCmd(27), pivot.setAngleCmd(position))
-              .until(() -> pivot.getAngle() > 15) // continue once we have cleared enough
+              .until(() -> pivot.getAngle() > 25) // continue once we have cleared enough
               .andThen(
                   new ParallelCommandGroup(
                       elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
