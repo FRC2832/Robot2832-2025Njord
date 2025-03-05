@@ -148,7 +148,8 @@ public class SwerveSubsystem extends SubsystemBase {
     try {
       config = RobotConfig.fromGUISettings();
 
-      final boolean enableFeedforward = true;
+      // TODO test feedforward with speed limiting?
+      final boolean enableFeedforward = false;
       // Configure AutoBuilder last
       AutoBuilder.configure(
           this::getPose,
@@ -164,7 +165,7 @@ public class SwerveSubsystem extends SubsystemBase {
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
                   moduleFeedForwards.linearForces());
             } else {
-              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              swerveDrive.setChassisSpeeds(limitSpeedsRobotRelative(speedsRobotRelative));
             }
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally
@@ -493,15 +494,7 @@ public class SwerveSubsystem extends SubsystemBase {
                   translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip);
           var rotation =
               angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity();
-          translation =
-              SwerveMath.limitVelocity(
-                  translation,
-                  swerveDrive.getFieldVelocity().plus(new ChassisSpeeds(0.0, 0.0001, 0)),
-                  swerveDrive.getPose(),
-                  Robot.kDefaultPeriod,
-                  59,
-                  RobotSim.getRobotMatter(),
-                  swerveDrive.swerveDriveConfiguration);
+          translation = limitSpeedsFieldOriented(translation);
           ChassisSpeeds velocity =
               new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
           var heading = swerveDrive.getOdometryHeading();
@@ -802,6 +795,39 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveModule[] getModules() {
     return swerveDrive.getModules();
   }
+
+  public Translation2d limitSpeedsFieldOriented(Translation2d translation) {
+    ChassisSpeeds fudgeFactorToStopDivideByZero = new ChassisSpeeds(0.0, 0.0001, 0);
+    return SwerveMath.limitVelocity(
+        translation,
+        swerveDrive.getFieldVelocity().plus(fudgeFactorToStopDivideByZero),
+        swerveDrive.getPose(),
+        Robot.kDefaultPeriod,
+        59,
+        RobotSim.getRobotMatter(),
+        swerveDrive.swerveDriveConfiguration);
+  }
+
+  public ChassisSpeeds limitSpeedsRobotRelative(ChassisSpeeds speeds) {
+    ChassisSpeeds fudgeFactorToStopDivideByZero = new ChassisSpeeds(0.0, 0.0001, 0);
+
+    var heading = swerveDrive.getOdometryHeading();
+    var fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, heading);
+    var fieldTrans =
+        SwerveMath.limitVelocity(
+            new Translation2d(fieldSpeeds.vxMetersPerSecond, fieldSpeeds.vyMetersPerSecond),
+            swerveDrive.getFieldVelocity().plus(fudgeFactorToStopDivideByZero),
+            swerveDrive.getPose(),
+            Robot.kDefaultPeriod,
+            59,
+            RobotSim.getRobotMatter(),
+            swerveDrive.swerveDriveConfiguration);
+
+    var newFieldSpeeds =
+        new ChassisSpeeds(fieldTrans.getX(), fieldTrans.getY(), speeds.omegaRadiansPerSecond);
+    return ChassisSpeeds.fromFieldRelativeSpeeds(newFieldSpeeds, heading);
+  }
+
   public Command alignToPose(Pose2d pose) {
     return new AlignToPose(this, pose);
   }
