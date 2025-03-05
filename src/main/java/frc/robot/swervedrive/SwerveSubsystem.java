@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
@@ -46,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
 import frc.robot.simulation.RobotSim;
 import frc.robot.vision.Vision;
+import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,6 +58,8 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.livoniawarriors.UtilFunctions;
+import org.livoniawarriors.leds.ILedSubsystem;
+import org.livoniawarriors.leds.LightningFlash;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -837,7 +841,29 @@ public class SwerveSubsystem extends SubsystemBase {
         () -> new AlignToPose(this, vision.getPoleLocation(pole)), Set.of(this));
   }
 
+  public Command alignToClosestPole(ILedSubsystem leds) {
+    return new DeferredCommand(() -> alignToClosePole(leds), Set.of(this, leds));
+  }
+
   public void setVision(Vision vision) {
     this.vision = vision;
+  }
+
+  private Command alignToClosePole(ILedSubsystem leds) {
+    // find closest pole
+    var poles = vision.getPoles(isRedAlliance());
+    var closePole = Poles.PoleA;
+    var currentPose = getPose();
+    var closeDist = UtilFunctions.getDistance(currentPose, poles.get(closePole));
+
+    for (var key : poles.keySet()) {
+      var newDist = UtilFunctions.getDistance(currentPose, poles.get(key));
+      if (newDist < closeDist) {
+        closeDist = newDist;
+        closePole = key;
+      }
+    }
+
+    return alignToPose(poles.get(closePole)).andThen(new LightningFlash(leds, Color.kPurple));
   }
 }

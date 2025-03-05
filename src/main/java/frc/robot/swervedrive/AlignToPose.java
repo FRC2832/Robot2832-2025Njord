@@ -4,7 +4,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.livoniawarriors.UtilFunctions;
 
 public class AlignToPose extends Command {
   private PIDController xController, yController, rotController;
@@ -42,6 +44,11 @@ public class AlignToPose extends Command {
     double ySpeed = yController.calculate(pose.getY());
     double rotValue = rotController.calculate(pose.getRotation().getDegrees());
 
+    // handle field oriented
+    if (UtilFunctions.getAlliance() == Alliance.Red) {
+      xSpeed *= -1;
+      ySpeed *= -1;
+    }
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rotValue);
 
     if (rotController.atSetpoint() && yController.atSetpoint() && xController.atSetpoint()) {

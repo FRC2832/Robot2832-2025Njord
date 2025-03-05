@@ -192,11 +192,17 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "ScoreCoral", intake.driveIntake(() -> 1, () -> true).withTimeout(1));
     NamedCommands.registerCommand("HomeCoral", intake.homeCoral(() -> 0));
+    NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
+    NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
     NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));
     NamedCommands.registerCommand("FineDriveD", swerveDrive.alignToPoleDeferred(Poles.PoleD));
+    NamedCommands.registerCommand("FineDriveE", swerveDrive.alignToPoleDeferred(Poles.PoleE));
     NamedCommands.registerCommand("FineDriveF", swerveDrive.alignToPoleDeferred(Poles.PoleF));
+    NamedCommands.registerCommand("FineDriveG", swerveDrive.alignToPoleDeferred(Poles.PoleG));
     NamedCommands.registerCommand("FineDriveH", swerveDrive.alignToPoleDeferred(Poles.PoleH));
     NamedCommands.registerCommand("FineDriveI", swerveDrive.alignToPoleDeferred(Poles.PoleI));
+    NamedCommands.registerCommand("FineDriveJ", swerveDrive.alignToPoleDeferred(Poles.PoleJ));
+    NamedCommands.registerCommand("FineDriveK", swerveDrive.alignToPoleDeferred(Poles.PoleK));
     NamedCommands.registerCommand("FineDriveL", swerveDrive.alignToPoleDeferred(Poles.PoleL));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
@@ -244,6 +250,7 @@ public class RobotContainer {
     driver.getSwerveLockTrigger().whileTrue(swerveDrive.swerveLock());
     driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
     // driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    driver.driveToPole().whileTrue(swerveDrive.alignToClosestPole(leds));
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
 

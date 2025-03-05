@@ -13,6 +13,7 @@ import frc.robot.Robot;
 import frc.robot.swervedrive.SwerveSubsystem;
 import java.awt.Desktop;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -45,11 +46,43 @@ public class Vision extends SubsystemBase {
   @AutoLogOutput double distTo12;
   @AutoLogOutput double distTo18;
 
+  private HashMap<Poles, Pose2d> bluePoses = new HashMap<Vision.Poles, Pose2d>();
+  private HashMap<Poles, Pose2d> redPoses = new HashMap<Vision.Poles, Pose2d>();
+
   public Vision(SwerveSubsystem swerve) {
     // register this subsystem with the command scheduler to have the periodic function called
     super();
     AutoLogOutputManager.addObject(this);
     this.swerve = swerve;
+
+    // get blue poles
+    bluePoses.put(Poles.PoleA, new Pose2d());
+    bluePoses.put(Poles.PoleB, new Pose2d());
+    bluePoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
+    bluePoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
+    bluePoses.put(Poles.PoleE, new Pose2d());
+    bluePoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
+    bluePoses.put(Poles.PoleG, new Pose2d());
+    bluePoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
+    bluePoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
+    bluePoses.put(Poles.PoleJ, new Pose2d());
+    bluePoses.put(Poles.PoleK, new Pose2d());
+    bluePoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+
+    // get red poles
+    redPoses.put(Poles.PoleA, new Pose2d());
+    redPoses.put(Poles.PoleB, new Pose2d());
+    redPoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
+    redPoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
+    redPoses.put(Poles.PoleE, new Pose2d());
+    redPoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
+    redPoses.put(Poles.PoleG, new Pose2d());
+    redPoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
+    redPoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
+    redPoses.put(Poles.PoleJ, new Pose2d());
+    redPoses.put(Poles.PoleK, new Pose2d());
+    redPoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+
     init();
   }
 
@@ -247,26 +280,11 @@ public class Vision extends SubsystemBase {
   }
 
   public Pose2d getPoleLocation(Poles pole) {
-    Pose2d pose;
-
-    if (pole == Poles.PoleC) {
-      pose = new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61));
-    } else if (pole == Poles.PoleD) {
-      pose = new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61));
-    } else if (pole == Poles.PoleF) {
-      pose = new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121));
-    } else if (pole == Poles.PoleH) {
-      pose = new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179));
-    } else if (pole == Poles.PoleI) {
-      pose = new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121));
-    } else if (pole == Poles.PoleL) {
-      pose = new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60));
+    if (swerve.isRedAlliance()) {
+      return redPoses.get(pole);
     } else {
-      // need to define all the poles!!!
-      pose = swerve.getPose();
+      return bluePoses.get(pole);
     }
-
-    return flipAlliance(pose);
   }
 
   public Pose2d flipAlliance(Pose2d poseToFlip) {
@@ -277,6 +295,14 @@ public class Vision extends SubsystemBase {
               new Rotation2d(Math.PI)));
     } else {
       return poseToFlip;
+    }
+  }
+
+  public HashMap<Poles, Pose2d> getPoles(boolean red) {
+    if (red) {
+      return redPoses;
+    } else {
+      return bluePoses;
     }
   }
 }
