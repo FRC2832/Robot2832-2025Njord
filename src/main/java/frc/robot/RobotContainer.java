@@ -44,6 +44,7 @@ import frc.robot.swervedrive.AlignToPose;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
+import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.util.Set;
 import org.livoniawarriors.LoopTimeLogger;
@@ -131,6 +132,8 @@ public class RobotContainer {
     }
 
     vision = new Vision(swerveDrive);
+    swerveDrive.setVision(vision);
+
     frontCamera =
         new AprilTagCamera(
             "Front",
@@ -194,6 +197,12 @@ public class RobotContainer {
         "ScoreCoral",
         new WaitCommand(0.5).andThen(intake.driveIntake(() -> 1, () -> true).withTimeout(1)));
     NamedCommands.registerCommand("HomeCoral", intake.homeCoral(() -> 0));
+    NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));
+    NamedCommands.registerCommand("FineDriveD", swerveDrive.alignToPoleDeferred(Poles.PoleD));
+    NamedCommands.registerCommand("FineDriveF", swerveDrive.alignToPoleDeferred(Poles.PoleF));
+    NamedCommands.registerCommand("FineDriveH", swerveDrive.alignToPoleDeferred(Poles.PoleH));
+    NamedCommands.registerCommand("FineDriveI", swerveDrive.alignToPoleDeferred(Poles.PoleI));
+    NamedCommands.registerCommand("FineDriveL", swerveDrive.alignToPoleDeferred(Poles.PoleL));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();

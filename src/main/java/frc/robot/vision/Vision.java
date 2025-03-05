@@ -4,7 +4,9 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -227,5 +229,54 @@ public class Vision extends SubsystemBase {
     }
 
     swerve.getField2d().getObject("tracked targets").setPoses(poses);
+  }
+
+  public enum Poles {
+    PoleA,
+    PoleB,
+    PoleC,
+    PoleD,
+    PoleE,
+    PoleF,
+    PoleG,
+    PoleH,
+    PoleI,
+    PoleJ,
+    PoleK,
+    PoleL
+  }
+
+  public Pose2d getPoleLocation(Poles pole) {
+    Pose2d pose;
+
+    if (pole == Poles.PoleC) {
+      pose = new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61));
+    } else if (pole == Poles.PoleD) {
+      pose = new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61));
+    } else if (pole == Poles.PoleF) {
+      pose = new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121));
+    } else if (pole == Poles.PoleH) {
+      pose = new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179));
+    } else if (pole == Poles.PoleI) {
+      pose = new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121));
+    } else if (pole == Poles.PoleL) {
+      pose = new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60));
+    } else {
+      // need to define all the poles!!!
+      pose = swerve.getPose();
+    }
+
+    return flipAlliance(pose);
+  }
+
+  public Pose2d flipAlliance(Pose2d poseToFlip) {
+    if (swerve.isRedAlliance()) {
+      return poseToFlip.relativeTo(
+          new Pose2d(
+              new Translation2d(fieldLayout.getFieldLength(), fieldLayout.getFieldWidth()),
+              new Rotation2d(Math.PI)));
+    } else {
+      return poseToFlip;
+    }
   }
 }

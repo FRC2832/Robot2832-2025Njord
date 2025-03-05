@@ -40,14 +40,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
 import frc.robot.simulation.RobotSim;
+import frc.robot.vision.Vision;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -72,6 +75,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private final boolean visionDriveTest = false;
 
   private DoubleSubscriber maxSpeed;
+
+  private Vision vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -610,7 +615,7 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @return true if the red alliance, false if blue. Defaults to false if none is available.
    */
-  private boolean isRedAlliance() {
+  public boolean isRedAlliance() {
     var alliance = DriverStation.getAlliance();
     return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
   }
@@ -796,5 +801,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public SwerveModule[] getModules() {
     return swerveDrive.getModules();
+  }
+  public Command alignToPose(Pose2d pose) {
+    return new AlignToPose(this, pose);
+  }
+
+  public Command alignToPoleDeferred(Vision.Poles pole) {
+    return new DeferredCommand(
+        () -> new AlignToPose(this, vision.getPoleLocation(pole)), Set.of(this));
+  }
+
+  public void setVision(Vision vision) {
+    this.vision = vision;
   }
 }
