@@ -61,4 +61,8 @@ public class OperatorControls {
   public Trigger getFastIntake() {
     return new Trigger(operator::getStartButton);
   }
+
+  public Trigger getSwitchPieceTrigger2() {
+    return new Trigger(operator::getBackButton);
+  }
 }

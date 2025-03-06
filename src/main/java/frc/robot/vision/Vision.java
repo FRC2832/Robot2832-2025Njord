@@ -56,17 +56,17 @@ public class Vision extends SubsystemBase {
     this.swerve = swerve;
 
     // get blue poles
-    bluePoses.put(Poles.PoleA, new Pose2d());
-    bluePoses.put(Poles.PoleB, new Pose2d());
+    bluePoses.put(Poles.PoleA, new Pose2d(3.180, 4.212, Rotation2d.fromDegrees(-1)));
+    bluePoses.put(Poles.PoleB, new Pose2d(3.682, 3.013, Rotation2d.fromDegrees(-0.1)));
     bluePoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
     bluePoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
-    bluePoses.put(Poles.PoleE, new Pose2d());
+    bluePoses.put(Poles.PoleE, new Pose2d(5.008, 2.814, Rotation2d.fromDegrees(118.9)));
     bluePoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
-    bluePoses.put(Poles.PoleG, new Pose2d());
+    bluePoses.put(Poles.PoleG, new Pose2d(5.795, 3.844, Rotation2d.fromDegrees(178.7)));
     bluePoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
     bluePoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
-    bluePoses.put(Poles.PoleJ, new Pose2d());
-    bluePoses.put(Poles.PoleK, new Pose2d());
+    bluePoses.put(Poles.PoleJ, new Pose2d(4.837, 5.324, Rotation2d.fromDegrees(-119.5)));
+    bluePoses.put(Poles.PoleK, new Pose2d(3.984, 5.247, Rotation2d.fromDegrees(-61.3)));
     bluePoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
 
     // get red poles

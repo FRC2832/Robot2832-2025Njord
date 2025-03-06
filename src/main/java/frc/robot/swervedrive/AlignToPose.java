@@ -1,5 +1,6 @@
 package frc.robot.swervedrive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,6 +14,7 @@ public class AlignToPose extends Command {
   private SwerveSubsystem drive;
   private boolean atSetpoint;
   private ChassisSpeeds noSpeeds;
+  private double lastHeading;
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose) {
     this.drive = swerve;
@@ -24,6 +26,7 @@ public class AlignToPose extends Command {
 
     rotController.setSetpoint(pose.getRotation().getDegrees());
     rotController.setTolerance(1);
+    lastHeading = pose.getRotation().getDegrees();
 
     xController.setSetpoint(pose.getX());
     xController.setTolerance(Units.inchesToMeters(0.5));
@@ -42,7 +45,13 @@ public class AlignToPose extends Command {
     Pose2d pose = drive.getPose();
     double xSpeed = xController.calculate(pose.getX());
     double ySpeed = yController.calculate(pose.getY());
-    double rotValue = rotController.calculate(pose.getRotation().getDegrees());
+
+    //handle 360 circle problem
+    double curHeading = pose.getRotation().getDegrees();
+    double centeredHeading =
+        MathUtil.inputModulus(curHeading, lastHeading - 180, lastHeading + 180);
+    double rotValue = rotController.calculate(centeredHeading);
+    lastHeading = centeredHeading;
 
     // handle field oriented
     if (UtilFunctions.getAlliance() == Alliance.Red) {

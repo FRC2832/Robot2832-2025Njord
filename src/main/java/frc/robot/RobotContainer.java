@@ -214,7 +214,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
     SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
-    SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
+    SmartDashboard.putData("Reset Elevator", elevator.manualHome());
 
     SmartDashboard.putData("Auto Test HP Load", LoadFromHp());
     SmartDashboard.putData(
@@ -252,7 +252,8 @@ public class RobotContainer {
     // driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     driver.driveToPole().whileTrue(swerveDrive.alignToClosestPole(leds));
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
-    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
+    op.getSwitchPieceTrigger2().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral, pivot::getAngle));
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
