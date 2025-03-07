@@ -141,10 +141,11 @@ public abstract class Elevator extends SubsystemBase {
 
   public Command manualHome() {
     return runOnce(
-        () -> {
-          double distance = OFFSET + Meter.of(getDistanceSensor()).in(Inches);
-          setEncoderPosition(distance);
-        });
+            () -> {
+              double distance = OFFSET + Meter.of(getDistanceSensor()).in(Inches);
+              setEncoderPosition(distance);
+            })
+        .ignoringDisable(true);
   }
 
   protected abstract double getVelocity();

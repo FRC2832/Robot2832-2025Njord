@@ -541,7 +541,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param velocity Velocity according to the field.
    */
   public void driveFieldOriented(ChassisSpeeds velocity) {
-    swerveDrive.driveFieldOriented(velocity);
+    swerveDrive.driveFieldOriented(limitSpeedsFieldOriented(velocity));
   }
 
   /**
@@ -810,6 +810,12 @@ public class SwerveSubsystem extends SubsystemBase {
         59,
         RobotSim.getRobotMatter(),
         swerveDrive.swerveDriveConfiguration);
+  }
+
+  public ChassisSpeeds limitSpeedsFieldOriented(ChassisSpeeds speeds) {
+    var oldTrans = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    var newTrans = limitSpeedsFieldOriented(oldTrans);
+    return new ChassisSpeeds(newTrans.getX(), newTrans.getY(), speeds.omegaRadiansPerSecond);
   }
 
   public ChassisSpeeds limitSpeedsRobotRelative(ChassisSpeeds speeds) {

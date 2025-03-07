@@ -46,7 +46,7 @@ public class AlignToPose extends Command {
     double xSpeed = xController.calculate(pose.getX());
     double ySpeed = yController.calculate(pose.getY());
 
-    //handle 360 circle problem
+    // handle 360 circle problem
     double curHeading = pose.getRotation().getDegrees();
     double centeredHeading =
         MathUtil.inputModulus(curHeading, lastHeading - 180, lastHeading + 180);

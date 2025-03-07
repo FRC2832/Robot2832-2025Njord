@@ -5,31 +5,38 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "LoadFromHP"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "LoadR to D"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "HomeCoral"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "ElevatorL4Coral"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CenterToH"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "FineDriveH"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 8.0
                 }
               }
             ]
@@ -39,25 +46,6 @@
           "type": "named",
           "data": {
             "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "D to LoadR"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ElevatorLoadPos"
-                }
-              }
-            ]
           }
         }
       ]
