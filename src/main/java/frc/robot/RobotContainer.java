@@ -260,6 +260,7 @@ public class RobotContainer {
     op.getSwitchPieceTrigger2().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getFastIntake()
         .whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral, pivot::getAngle));
+    op.getHomeElevator().whileTrue(elevator.manualHome());
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);

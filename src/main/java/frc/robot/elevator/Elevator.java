@@ -89,10 +89,10 @@ public abstract class Elevator extends SubsystemBase {
     double distance = OFFSET + Meter.of(getDistanceSensor()).in(Inches);
 
     // check if sensor is near the bottom to do the reset
-    if ((15 < distance) && (distance < 30)) {
+    if (((15 < distance) && (distance < 30)) && (Math.abs(distance - getMotorPosition()) < 6)) {
       if (positionReset.updateReset(getMotorPosition(), distance)) {
         // it is time to reset
-        // setEncoderPosition(distance);
+        setEncoderPosition(distance);
       }
     } else {
       // elevator is up, reset timer

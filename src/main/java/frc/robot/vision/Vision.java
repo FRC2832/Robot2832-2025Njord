@@ -71,7 +71,7 @@ public class Vision extends SubsystemBase {
 
     // get red poles
     for (var pole : bluePoses.keySet()) {
-      var test = flipAlliance(bluePoses.get(pole));
+      var test = flipFieldAlways(bluePoses.get(pole));
       redPoses.put(pole, test);
     }
 
@@ -302,6 +302,19 @@ public class Vision extends SubsystemBase {
     } else {
       return poseToFlip;
     }
+  }
+
+  /**
+   * Always flips alliance, irregardless of alliance
+   *
+   * @param poseToFlip
+   * @return
+   */
+  public Pose2d flipFieldAlways(Pose2d poseToFlip) {
+    return poseToFlip.relativeTo(
+        new Pose2d(
+            new Translation2d(fieldLayout.getFieldLength(), fieldLayout.getFieldWidth()),
+            new Rotation2d(Math.PI)));
   }
 
   public HashMap<Poles, Pose2d> getPoles(boolean red) {

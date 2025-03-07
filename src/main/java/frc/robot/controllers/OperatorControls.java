@@ -65,4 +65,11 @@ public class OperatorControls {
   public Trigger getSwitchPieceTrigger2() {
     return new Trigger(operator::getBackButton);
   }
+
+  public Trigger getHomeElevator() {
+    return new Trigger(
+        () -> {
+          return operator.getPOV() == 0 || operator.getPOV() == 315 || operator.getPOV() == 45;
+        });
+  }
 }
