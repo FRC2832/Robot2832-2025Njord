@@ -5,9 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import org.livoniawarriors.UtilFunctions;
 
 public class AlignToPose extends Command {
   private PIDController xController, yController, rotController;
@@ -46,7 +44,7 @@ public class AlignToPose extends Command {
     double xSpeed = xController.calculate(pose.getX());
     double ySpeed = yController.calculate(pose.getY());
 
-    //handle 360 circle problem
+    // handle 360 circle problem
     double curHeading = pose.getRotation().getDegrees();
     double centeredHeading =
         MathUtil.inputModulus(curHeading, lastHeading - 180, lastHeading + 180);
@@ -54,10 +52,10 @@ public class AlignToPose extends Command {
     lastHeading = centeredHeading;
 
     // handle field oriented
-    if (UtilFunctions.getAlliance() == Alliance.Red) {
+    /*if (UtilFunctions.getAlliance() == Alliance.Red) {
       xSpeed *= -1;
       ySpeed *= -1;
-    }
+    }*/
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rotValue);
 
     if (rotController.atSetpoint() && yController.atSetpoint() && xController.atSetpoint()) {

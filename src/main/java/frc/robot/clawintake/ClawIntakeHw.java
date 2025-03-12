@@ -26,7 +26,7 @@ public class ClawIntakeHw extends ClawIntake {
 
   @Override
   public boolean hasCoral() {
-    return 0 <= distance && distance < 80;
+    return 0 <= distance && distance < 40;
   }
 
   @Override

@@ -70,19 +70,25 @@ public class Vision extends SubsystemBase {
     bluePoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
 
     // get red poles
-    redPoses.put(Poles.PoleA, new Pose2d());
-    redPoses.put(Poles.PoleB, new Pose2d());
-    redPoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
-    redPoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
-    redPoses.put(Poles.PoleE, new Pose2d());
-    redPoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
-    redPoses.put(Poles.PoleG, new Pose2d());
-    redPoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
-    redPoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
-    redPoses.put(Poles.PoleJ, new Pose2d());
-    redPoses.put(Poles.PoleK, new Pose2d());
-    redPoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+    for (var pole : bluePoses.keySet()) {
+      var test = flipFieldAlways(bluePoses.get(pole));
+      redPoses.put(pole, test);
+    }
 
+    /*
+        redPoses.put(Poles.PoleA, new Pose2d());
+        redPoses.put(Poles.PoleB, new Pose2d());
+        redPoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
+        redPoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
+        redPoses.put(Poles.PoleE, new Pose2d());
+        redPoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
+        redPoses.put(Poles.PoleG, new Pose2d());
+        redPoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
+        redPoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
+        redPoses.put(Poles.PoleJ, new Pose2d());
+        redPoses.put(Poles.PoleK, new Pose2d());
+        redPoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+    */
     init();
   }
 
@@ -296,6 +302,19 @@ public class Vision extends SubsystemBase {
     } else {
       return poseToFlip;
     }
+  }
+
+  /**
+   * Always flips alliance, irregardless of alliance
+   *
+   * @param poseToFlip
+   * @return
+   */
+  public Pose2d flipFieldAlways(Pose2d poseToFlip) {
+    return poseToFlip.relativeTo(
+        new Pose2d(
+            new Translation2d(fieldLayout.getFieldLength(), fieldLayout.getFieldWidth()),
+            new Rotation2d(Math.PI)));
   }
 
   public HashMap<Poles, Pose2d> getPoles(boolean red) {

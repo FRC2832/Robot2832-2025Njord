@@ -8,7 +8,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
 import org.livoniawarriors.motorcontrol.TalonFXMotor;
 
@@ -25,9 +24,9 @@ public class ClawPivotHw extends ClawPivot {
     CANcoderConfigurator cfg;
     cfg = pivotAngle.getConfigurator();
     StatusCode statusCode = cfg.refresh(configuration);
-    configuration.MagnetSensor.MagnetOffset = 0.109375;
-    configuration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    statusCode = cfg.apply(configuration);
+    // configuration.MagnetSensor.MagnetOffset = 0.018311;
+    // configuration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    // statusCode = cfg.apply(configuration);
     // stop unused warning for now
     statusCode = (StatusCode) statusCode;
 

@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
@@ -184,6 +186,7 @@ public class RobotContainer {
 
     // Register Named Commands for PathPlanner
     NamedCommands.registerCommand("LoadFromHP", LoadFromHp());
+    NamedCommands.registerCommand("PushPartner", swerveDrive.pushPartner());
     NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
     NamedCommands.registerCommand(
         "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
@@ -191,7 +194,9 @@ public class RobotContainer {
         "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
         "ScoreCoral", intake.driveIntake(() -> 1, () -> true).withTimeout(1));
-    NamedCommands.registerCommand("HomeCoral", intake.homeCoral(() -> 0));
+    NamedCommands.registerCommand(
+        "HomeCoral",
+        new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
     NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
     NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));
@@ -253,7 +258,9 @@ public class RobotContainer {
     driver.driveToPole().whileTrue(swerveDrive.alignToClosestPole(leds));
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
     op.getSwitchPieceTrigger2().whileTrue(pieceTypeSwitcher.switchPieceSelected());
-    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral, pivot::getAngle));
+    op.getFastIntake()
+        .whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral, pivot::getAngle));
+    op.getHomeElevator().whileTrue(elevator.manualHome());
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
