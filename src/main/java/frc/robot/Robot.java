@@ -37,6 +37,13 @@ public class Robot extends LoggedRobot {
 
   ArrayList<Runnable> periodics;
 
+  // DriverStation.teleopEnabled seems to give incorrect results, this is a quick fix attempt
+  static boolean teleopFlag = false;
+
+  public static boolean robotIsTeleop() {
+    return teleopFlag;
+  }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -139,7 +146,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    teleopFlag = false;
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -147,6 +156,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    teleopFlag = false;
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -161,6 +171,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    teleopFlag = true;
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8580000000000001,
-        "y": 1.402249999999999
+        "x": 7.1175,
+        "y": 5.662999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.093506483023195,
-        "y": 1.486135019246856
+        "x": 7.367086945700974,
+        "y": 5.648634884766938
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.0127499999999996,
-        "y": 3.8104999999999993
+        "x": 5.339,
+        "y": 5.071
       },
       "prevControl": {
-        "x": 2.3121947561157277,
-        "y": 2.911004936708978
+        "x": 5.077248457692876,
+        "y": 5.004607497297719
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "L4 Pole I"
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 5.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -124.56252464888179
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

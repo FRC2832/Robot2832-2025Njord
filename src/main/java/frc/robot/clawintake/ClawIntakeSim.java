@@ -56,21 +56,14 @@ public class ClawIntakeSim extends ClawIntake {
   }
 
   @Override
-  void setVelocity(double velocity) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
-  }
+  void setVelocity(double velocity) {}
 
   @Override
-  void setPosition(double position) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setPosition'");
-  }
+  void setPosition(double position) {}
 
   @Override
   double getPosition() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+    return 0;
   }
 
   @Override
@@ -78,7 +71,6 @@ public class ClawIntakeSim extends ClawIntake {
 
   @Override
   double getVelocity() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getVelocity'");
+    return 0;
   }
 }

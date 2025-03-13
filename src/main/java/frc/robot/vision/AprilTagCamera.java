@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.livoniawarriors.UtilFunctions;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -69,6 +70,17 @@ public class AprilTagCamera {
   /** Last read from the camera timestamp to prevent lag due to slow data fetches. */
   @AutoLogOutput(key = "Camera {name}/lastReadTimestamp")
   private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+
+  private double lastTagTimestamp;
+
+  @AutoLogOutput(key = "Camera {name}/distToTag12")
+  double distTo12;
+
+  @AutoLogOutput(key = "Camera {name}/distToTag18")
+  double distTo18;
+
+  @AutoLogOutput(key = "Camera {name}/numTagsSeen")
+  int numTagsSeen;
 
   @SuppressWarnings("unused")
   private final String name;
@@ -298,6 +310,17 @@ public class AprilTagCamera {
       } else {
         latencyAlert.set(false);
       }
+
+      for (var tag : change.targets) {
+        lastTagTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+        if (tag.fiducialId == 12) {
+          distTo12 = UtilFunctions.getDistance(tag.bestCameraToTarget);
+        }
+        if (tag.fiducialId == 18) {
+          distTo18 = UtilFunctions.getDistance(tag.bestCameraToTarget);
+        }
+      }
+      numTagsSeen = change.targets.size();
     }
     estimatedRobotPose = visionEst;
   }
@@ -361,7 +384,7 @@ public class AprilTagCamera {
 
   @AutoLogOutput(key = "Camera {name}/hasTarget")
   public boolean hasTarget() {
-    return !resultsList.isEmpty();
+    return Microseconds.of(NetworkTablesJNI.now()).in(Seconds) - lastTagTimestamp < 0.25;
   }
 
   @AutoLogOutput(key = "Camera {name}/isConnected")

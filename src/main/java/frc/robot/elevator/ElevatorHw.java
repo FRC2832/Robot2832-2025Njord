@@ -77,4 +77,9 @@ public class ElevatorHw extends Elevator {
       sensorValue = filter.calculate(measurement);
     }
   }
+
+  @Override
+  protected double getVelocity() {
+    return leftMotor.getVelocity();
+  }
 }

@@ -1,5 +1,6 @@
 package frc.robot.piecetypeswitcher;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -37,5 +38,12 @@ public class PieceTypeSwitcher extends SubsystemBase {
 
   public boolean isAlgae() {
     return pieceSelected == "Algae";
+  }
+
+  public Color getPieceColor() {
+    if (isCoral()) {
+      return Color.kYellow;
+    }
+    return Color.kAqua;
   }
 }

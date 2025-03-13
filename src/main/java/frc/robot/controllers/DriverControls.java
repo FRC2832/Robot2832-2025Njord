@@ -54,4 +54,8 @@ public class DriverControls {
   public Trigger getSwitchPieceTrigger() {
     return new Trigger(this::getSwitchPiece);
   }
+
+  public Trigger driveToPole() {
+    return new Trigger(driverRight::getTrigger);
+  }
 }

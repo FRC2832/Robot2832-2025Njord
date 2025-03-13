@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -40,9 +41,11 @@ import frc.robot.elevator.ElevatorSimul;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.simulation.RobotSim;
+import frc.robot.swervedrive.AlignToPose;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
+import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.util.Set;
 import org.livoniawarriors.LoopTimeLogger;
@@ -50,7 +53,6 @@ import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
 import org.livoniawarriors.leds.LedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
-import org.livoniawarriors.leds.RainbowLeds;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
 /**
@@ -74,6 +76,9 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
+  private AprilTagCamera backCamera;
+  private AprilTagCamera leftCamera;
+  private AprilTagCamera rightCamera;
 
   public final String CTRE_CAN_BUS = "Njord";
   private final String[] PDP_CHANNEL_NAMES = {
@@ -121,30 +126,93 @@ public class RobotContainer {
       elevator = new ElevatorSimul();
       pivot = new ClawPivotSim();
     } else {
-      swerveDrive.setMaximumSpeed(3, Math.toRadians(220));
+      swerveDrive.setMaximumSpeed(5, Math.toRadians(220));
       intake = new ClawIntakeHw();
       elevator = new ElevatorHw();
       pivot = new ClawPivotHw();
     }
 
     vision = new Vision(swerveDrive);
+    swerveDrive.setVision(vision);
+
     frontCamera =
         new AprilTagCamera(
-            "front",
-            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
-            new Translation3d(0.363, 0, 0.31),
+            "Front",
+            new Rotation3d(0, -Units.degreesToRadians(21), Math.toRadians(0)),
+            new Translation3d(
+                Units.inchesToMeters(5.375),
+                Units.inchesToMeters(-13.125),
+                Units.inchesToMeters(39.75)),
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    // vision.addCamera(frontCamera);
+    backCamera =
+        new AprilTagCamera(
+            "Back",
+            new Rotation3d(0, -Units.degreesToRadians(18), Math.toRadians(180)),
+            new Translation3d(
+                Units.inchesToMeters(-1.125),
+                Units.inchesToMeters(-13.125),
+                Units.inchesToMeters(39.375)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    leftCamera =
+        new AprilTagCamera(
+            "Left",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(-45)),
+            new Translation3d(
+                Units.inchesToMeters(13.25), Units.inchesToMeters(10.5), Units.inchesToMeters(8.5)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    rightCamera =
+        new AprilTagCamera(
+            "Right",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(45)),
+            new Translation3d(
+                Units.inchesToMeters(13.25),
+                Units.inchesToMeters(-10.5),
+                Units.inchesToMeters(8.5)),
+            VecBuilder.fill(4, 4, 8),
+            VecBuilder.fill(0.5, 0.5, 1));
+
+    vision.addCamera(frontCamera);
+    // vision.addCamera(backCamera);
+    vision.addCamera(leftCamera);
+    vision.addCamera(rightCamera);
+
     // add some buttons to press for development
-    SmartDashboard.putData(
-        "Fine Drive to Pose",
-        swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
 
     // Register Named Commands for PathPlanner
-    NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
-    NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
+    NamedCommands.registerCommand(
+        "LoadFromHP", new ConditionalCommand(LoadFromHp(), new WaitCommand(1), Robot::isReal));
+    NamedCommands.registerCommand("PushPartner", swerveDrive.pushPartner());
+    NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
+    NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
+    NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
+    NamedCommands.registerCommand(
+        "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
+    NamedCommands.registerCommand(
+        "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
+    NamedCommands.registerCommand(
+        "ScoreCoral", intake.driveIntake(() -> 1, () -> true).withTimeout(1));
+    NamedCommands.registerCommand(
+        "HomeCoral",
+        new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
+
+    NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
+    NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
+    NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));
+    NamedCommands.registerCommand("FineDriveD", swerveDrive.alignToPoleDeferred(Poles.PoleD));
+    NamedCommands.registerCommand("FineDriveE", swerveDrive.alignToPoleDeferred(Poles.PoleE));
+    NamedCommands.registerCommand("FineDriveF", swerveDrive.alignToPoleDeferred(Poles.PoleF));
+    NamedCommands.registerCommand("FineDriveG", swerveDrive.alignToPoleDeferred(Poles.PoleG));
+    NamedCommands.registerCommand("FineDriveH", swerveDrive.alignToPoleDeferred(Poles.PoleH));
+    NamedCommands.registerCommand("FineDriveI", swerveDrive.alignToPoleDeferred(Poles.PoleI));
+    NamedCommands.registerCommand("FineDriveJ", swerveDrive.alignToPoleDeferred(Poles.PoleJ));
+    NamedCommands.registerCommand("FineDriveK", swerveDrive.alignToPoleDeferred(Poles.PoleK));
+    NamedCommands.registerCommand("FineDriveL", swerveDrive.alignToPoleDeferred(Poles.PoleL));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -155,7 +223,12 @@ public class RobotContainer {
 
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
     SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
-    SmartDashboard.putData("Reset Elevator", elevator.resetElevator());
+    SmartDashboard.putData("Reset Elevator", elevator.manualHome());
+
+    SmartDashboard.putData("Auto Test HP Load", LoadFromHp());
+    SmartDashboard.putData(
+        "Drive to Pose",
+        new AlignToPose(swerveDrive, new Pose2d(2, 2, Rotation2d.fromDegrees(60))));
 
     // periodic tasks to add
     robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
@@ -185,13 +258,17 @@ public class RobotContainer {
 
     driver.getSwerveLockTrigger().whileTrue(swerveDrive.swerveLock());
     driver.isFieldOrientedResetRequestedTrigger().whileTrue(swerveDrive.zeroRobot());
-    driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    // driver.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    driver.driveToPole().whileTrue(swerveDrive.alignToClosestPole(leds));
     op.getSwitchPieceTrigger().whileTrue(pieceTypeSwitcher.switchPieceSelected());
-    op.getFastIntake().whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral));
+    op.getSwitchPieceTrigger2().whileTrue(pieceTypeSwitcher.switchPieceSelected());
+    op.getFastIntake()
+        .whileTrue(intake.driveIntakeFast(pieceTypeSwitcher::isCoral, pivot::getAngle));
+    op.getHomeElevator().whileTrue(elevator.manualHome());
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
     // frontLeds.setDefaultCommand(
     //    new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
     // rearLeds.setDefaultCommand(
@@ -233,11 +310,25 @@ public class RobotContainer {
     new Trigger(() -> op.getLoadingPositionCommand())
         .whileTrue(setScoringPosition(ScoringPositions.LoadingPosition));
 
-    new Trigger(
-            () -> {
-              return elevator.getCollisionWarning() || pivot.getCollisionWarning();
-            })
+    new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
+
+    // RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
+    // new Trigger(() -> Robot.robotIsTeleop() && (isCollisionWarning() == false))
+    //    .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+    /*
+    new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
+        .whileTrue(new BreathLeds(leds, Color.kMagenta));
+    */
+    /*
+    RobotModeTriggers.teleop().whileTrue(new ConditionalCommand(
+        new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)),
+        new BreathLeds(leds, pieceTypeSwitcher::getPieceColor),
+        this::isCollisionWarning
+    ));
+    */
+
   }
 
   /**
@@ -247,6 +338,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public boolean isCollisionWarning() {
+    return elevator.getCollisionWarning() || pivot.getCollisionWarning();
   }
 
   enum Zones {
@@ -280,39 +375,53 @@ public class RobotContainer {
     Zones curZone = getZone(elevator.getPosition(), pivot.getAngle());
     Zones destZone = getZone(elevator.getSetPosition(position), pivot.getSetPosition(position));
 
+    Command result;
+
     if (curZone == Zones.ZoneD) {
       // if we start in danger zone, get out, then rerun this logic to get to the spot
-      return pivot.setAngleCmd(30).andThen(setScoringPosition(position));
+      result = pivot.setAngleCmd(30).andThen(setScoringPosition(position));
     } else if (curZone == destZone) { // any zone to any zone
-      return new ParallelCommandGroup(
-          elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
-          pivot.setAngleCmd(position).andThen(pivot.holdClawPivot()));
+      result =
+          new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(position));
     } else if ((curZone == Zones.ZoneA || curZone == Zones.ZoneC)
         && destZone == Zones.ZoneB) { // (A or C) to B
-      return pivot
-          .setAngleCmd(45.0)
-          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
-          .andThen(
-              new ParallelCommandGroup(
-                  elevator.setPositionCmd(position).andThen(elevator.holdElevator()),
-                  pivot.setAngleCmd(position).andThen(pivot.holdClawPivot())));
+      result =
+          new ParallelCommandGroup(elevator.setPositionCmd(27), pivot.setAngleCmd(position))
+              .until(() -> pivot.getAngle() > 25) // continue once we have cleared enough
+              .andThen(
+                  new ParallelCommandGroup(
+                      elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
     } else if ((curZone == Zones.ZoneA && destZone == Zones.ZoneC)
         || (curZone == Zones.ZoneC
             && destZone
                 == Zones.ZoneA)) { // A or C) to (A or C) [but not going from A to A or C to C]
-      return pivot
-          .setAngleCmd(45.0)
-          .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
-          .andThen(elevator.setPositionCmd(position))
-          .andThen(pivot.setAngleCmd(position));
-    } else if (curZone == Zones.ZoneB
-        && (destZone == Zones.ZoneA || destZone == Zones.ZoneC)) { // B to (A or C)
-      return elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
+      result =
+          pivot
+              .setAngleCmd(45.0)
+              .until(() -> pivot.getAngle() > 20) // continue once we have cleared enough
+              .andThen(elevator.setPositionCmd(position))
+              .andThen(pivot.setAngleCmd(position));
+    } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneC) { // B to C
+      result = elevator.setPositionCmd(position).andThen(pivot.setAngleCmd(position));
       // drive to low position, 20 in
       // move claw/destination to position
+    } else if (curZone == Zones.ZoneB && destZone == Zones.ZoneA) { // B to A
+      result =
+          new ParallelCommandGroup(elevator.setPositionCmd(position), pivot.setAngleCmd(20))
+              .until(() -> elevator.getMotorPosition() < 27)
+              .andThen(
+                  new ParallelCommandGroup(
+                      elevator.setPositionCmd(position), pivot.setAngleCmd(position)));
     } else { // scary...
-      return new LightningFlash(leds, Color.kLavenderBlush)
-          .andThen(new BreathLeds(leds, Color.kLavender));
+      result =
+          new LightningFlash(leds, Color.kLavenderBlush)
+              .andThen(new BreathLeds(leds, Color.kLavender));
     }
+
+    return result;
+  }
+
+  private Command LoadFromHp() {
+    return intake.driveIntake(() -> 1, () -> true).until(intake::hasCoral);
   }
 }

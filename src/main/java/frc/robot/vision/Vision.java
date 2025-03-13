@@ -4,15 +4,21 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.swervedrive.SwerveSubsystem;
 import java.awt.Desktop;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.livoniawarriors.UtilFunctions;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.VisionSystemSim;
@@ -37,10 +43,52 @@ public class Vision extends SubsystemBase {
 
   private ArrayList<AprilTagCamera> cameras;
 
+  @AutoLogOutput double distTo12;
+  @AutoLogOutput double distTo18;
+
+  private HashMap<Poles, Pose2d> bluePoses = new HashMap<Vision.Poles, Pose2d>();
+  private HashMap<Poles, Pose2d> redPoses = new HashMap<Vision.Poles, Pose2d>();
+
   public Vision(SwerveSubsystem swerve) {
     // register this subsystem with the command scheduler to have the periodic function called
     super();
+    AutoLogOutputManager.addObject(this);
     this.swerve = swerve;
+
+    // get blue poles
+    bluePoses.put(Poles.PoleA, new Pose2d(3.180, 4.212, Rotation2d.fromDegrees(-1)));
+    bluePoses.put(Poles.PoleB, new Pose2d(3.682, 3.013, Rotation2d.fromDegrees(-0.1)));
+    bluePoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
+    bluePoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
+    bluePoses.put(Poles.PoleE, new Pose2d(5.008, 2.814, Rotation2d.fromDegrees(118.9)));
+    bluePoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
+    bluePoses.put(Poles.PoleG, new Pose2d(5.795, 3.844, Rotation2d.fromDegrees(178.7)));
+    bluePoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
+    bluePoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
+    bluePoses.put(Poles.PoleJ, new Pose2d(4.837, 5.324, Rotation2d.fromDegrees(-119.5)));
+    bluePoses.put(Poles.PoleK, new Pose2d(3.984, 5.247, Rotation2d.fromDegrees(-61.3)));
+    bluePoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+
+    // get red poles
+    for (var pole : bluePoses.keySet()) {
+      var test = flipFieldAlways(bluePoses.get(pole));
+      redPoses.put(pole, test);
+    }
+
+    /*
+        redPoses.put(Poles.PoleA, new Pose2d());
+        redPoses.put(Poles.PoleB, new Pose2d());
+        redPoses.put(Poles.PoleC, new Pose2d(3.643, 2.967, Rotation2d.fromDegrees(61)));
+        redPoses.put(Poles.PoleD, new Pose2d(3.953, 2.792, Rotation2d.fromDegrees(61)));
+        redPoses.put(Poles.PoleE, new Pose2d());
+        redPoses.put(Poles.PoleF, new Pose2d(5.306, 2.995, Rotation2d.fromDegrees(121)));
+        redPoses.put(Poles.PoleG, new Pose2d());
+        redPoses.put(Poles.PoleH, new Pose2d(5.792, 4.198, Rotation2d.fromDegrees(-179)));
+        redPoses.put(Poles.PoleI, new Pose2d(5.339, 5.071, Rotation2d.fromDegrees(-121)));
+        redPoses.put(Poles.PoleJ, new Pose2d());
+        redPoses.put(Poles.PoleK, new Pose2d());
+        redPoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
+    */
     init();
   }
 
@@ -103,6 +151,11 @@ public class Vision extends SubsystemBase {
             pose.estimatedPose.toPose2d(), pose.timestampSeconds, c.curStdDevs);
       }
     }
+
+    distTo12 =
+        UtilFunctions.getDistance(swerve.getPose(), fieldLayout.getTagPose(12).get().toPose2d());
+    distTo18 =
+        UtilFunctions.getDistance(swerve.getPose(), fieldLayout.getTagPose(18).get().toPose2d());
   }
 
   /**
@@ -215,5 +268,60 @@ public class Vision extends SubsystemBase {
     }
 
     swerve.getField2d().getObject("tracked targets").setPoses(poses);
+  }
+
+  public enum Poles {
+    PoleA,
+    PoleB,
+    PoleC,
+    PoleD,
+    PoleE,
+    PoleF,
+    PoleG,
+    PoleH,
+    PoleI,
+    PoleJ,
+    PoleK,
+    PoleL
+  }
+
+  public Pose2d getPoleLocation(Poles pole) {
+    if (swerve.isRedAlliance()) {
+      return redPoses.get(pole);
+    } else {
+      return bluePoses.get(pole);
+    }
+  }
+
+  public Pose2d flipAlliance(Pose2d poseToFlip) {
+    if (swerve.isRedAlliance()) {
+      return poseToFlip.relativeTo(
+          new Pose2d(
+              new Translation2d(fieldLayout.getFieldLength(), fieldLayout.getFieldWidth()),
+              new Rotation2d(Math.PI)));
+    } else {
+      return poseToFlip;
+    }
+  }
+
+  /**
+   * Always flips alliance, irregardless of alliance
+   *
+   * @param poseToFlip
+   * @return
+   */
+  public Pose2d flipFieldAlways(Pose2d poseToFlip) {
+    return poseToFlip.relativeTo(
+        new Pose2d(
+            new Translation2d(fieldLayout.getFieldLength(), fieldLayout.getFieldWidth()),
+            new Rotation2d(Math.PI)));
+  }
+
+  public HashMap<Poles, Pose2d> getPoles(boolean red) {
+    if (red) {
+      return redPoses;
+    } else {
+      return bluePoses;
+    }
   }
 }
