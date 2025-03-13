@@ -81,9 +81,35 @@
           }
         },
         {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
           "type": "named",
           "data": {
             "name": "LoadFromHP"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShakeRobotLeft"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -169,9 +195,37 @@
           }
         },
         {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
           "type": "named",
           "data": {
             "name": "LoadFromHP"
+                            }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShakeRobotLeft"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
           }
         },
         {

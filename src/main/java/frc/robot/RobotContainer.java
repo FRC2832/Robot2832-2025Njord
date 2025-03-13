@@ -185,9 +185,12 @@ public class RobotContainer {
     // add some buttons to press for development
 
     // Register Named Commands for PathPlanner
-    NamedCommands.registerCommand("LoadFromHP", LoadFromHp());
+    NamedCommands.registerCommand(
+        "LoadFromHP", new ConditionalCommand(LoadFromHp(), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("PushPartner", swerveDrive.pushPartner());
     NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
+    NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
+    NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
     NamedCommands.registerCommand(
         "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
@@ -197,6 +200,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "HomeCoral",
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
+
     NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
     NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
     NamedCommands.registerCommand("FineDriveC", swerveDrive.alignToPoleDeferred(Poles.PoleC));

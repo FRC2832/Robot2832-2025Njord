@@ -851,6 +851,10 @@ public class SwerveSubsystem extends SubsystemBase {
     return new DeferredCommand(() -> alignToClosePole(leds), Set.of(this, leds));
   }
 
+  public Command shakeRobot(boolean leftFirst) {
+    return new ShakeRobot(this, leftFirst);
+  }
+
   public void setVision(Vision vision) {
     this.vision = vision;
   }

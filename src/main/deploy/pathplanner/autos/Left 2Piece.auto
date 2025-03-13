@@ -81,9 +81,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "LoadFromHP"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadFromHP"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShakeRobotRight"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -169,9 +195,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "LoadFromHP"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadFromHP"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShakeRobotRight"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
