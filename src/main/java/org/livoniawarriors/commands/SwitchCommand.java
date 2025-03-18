@@ -9,8 +9,10 @@ import java.util.function.BooleanSupplier;
  * A command which switches between the behaviors based on the conditions. <br>
  * The conditions are prioritized in the order they are specified in the arrays. The commands array
  * must be 1 longer than the conditions array. The last command will be the default command to run
- * if no condition is met. Ending the SwitchCommand ends all commands passed to it. 
- * Finishes when the currently running command finishes. If you want to continue the command, use a {@code RepeatCommand}<br><br>
+ * if no condition is met. Ending the SwitchCommand ends all commands passed to it. Finishes when
+ * the currently running command finishes. If you want to continue the command, use a {@code
+ * RepeatCommand}<br>
+ * <br>
  * SwitchCommandBuilder provides an easier way to construct this.
  */
 public class SwitchCommand extends Command {
