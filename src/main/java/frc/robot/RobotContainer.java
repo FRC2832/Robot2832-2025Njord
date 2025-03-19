@@ -27,12 +27,14 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
-import frc.robot.clawintake.ClawIntakeHw;
+import frc.robot.clawintake.ClawIntakeHwV2;
 import frc.robot.clawintake.ClawIntakeSim;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
 import frc.robot.clawpivot.ClawPivotSim;
 import frc.robot.clawpivot.PlaySong;
+import frc.robot.climb.Climb;
+import frc.robot.climb.ClimbHw;
 import frc.robot.controllers.DriverControls;
 import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
@@ -40,6 +42,8 @@ import frc.robot.elevator.ElevatorHw;
 import frc.robot.elevator.ElevatorSimul;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.piecetypeswitcher.ScoringPositions;
+import frc.robot.ramp.Ramp;
+import frc.robot.ramp.RampHw;
 import frc.robot.simulation.RobotSim;
 import frc.robot.swervedrive.AlignToPose;
 import frc.robot.swervedrive.SwerveSubsystem;
@@ -73,6 +77,8 @@ public class RobotContainer {
   private ClawPivot pivot;
   private ClawIntake intake;
   private PieceTypeSwitcher pieceTypeSwitcher;
+  private Ramp ramp;
+  private Climb climb;
 
   private SendableChooser<Command> autoChooser;
   private AprilTagCamera frontCamera;
@@ -127,11 +133,13 @@ public class RobotContainer {
       pivot = new ClawPivotSim();
     } else {
       swerveDrive.setMaximumSpeed(5, Math.toRadians(220));
-      intake = new ClawIntakeHw();
+      intake = new ClawIntakeHwV2();
       elevator = new ElevatorHw();
       pivot = new ClawPivotHw();
     }
 
+    ramp = new RampHw();
+    climb = new ClimbHw();
     vision = new Vision(swerveDrive);
     swerveDrive.setVision(vision);
 
@@ -177,7 +185,7 @@ public class RobotContainer {
             VecBuilder.fill(4, 4, 8),
             VecBuilder.fill(0.5, 0.5, 1));
 
-    vision.addCamera(frontCamera);
+    // vision.addCamera(frontCamera);
     // vision.addCamera(backCamera);
     vision.addCamera(leftCamera);
     vision.addCamera(rightCamera);
@@ -268,22 +276,18 @@ public class RobotContainer {
 
     // setup default commands that are used for driving
     swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    // leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
-    // frontLeds.setDefaultCommand(
-    //    new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
-    // rearLeds.setDefaultCommand(
-    //    new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
-    // frontLeds.setDefaultCommand(new RainbowLeds(frontLeds));
-    // rearLeds.setDefaultCommand(new RainbowLeds(rearLeds));
-    // rearLeds.setDefaultCommand(new TestLeds(rearLeds));
-
-    new Trigger(() -> Math.abs(op.getElevatorRequest()) > 0.03)
-        .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
+    climb.setDefaultCommand(climb.setPowerCmd(driver::getClimbPercent));
+    ramp.setDefaultCommand(ramp.setPowerCmd(driver::getRampPercent));
     elevator.setDefaultCommand(elevator.holdElevator());
-    new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
-        .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
     pivot.setDefaultCommand(pivot.holdClawPivot());
     intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
+    leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
+
+    // operator control of claw/elevator
+    new Trigger(() -> Math.abs(op.getElevatorRequest()) > 0.03)
+        .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
+    new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
+        .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
     intake
         .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
         .whileTrue(intake.homeCoral(op::getIntakeRequest));
@@ -312,23 +316,6 @@ public class RobotContainer {
 
     new Trigger(this::isCollisionWarning)
         .whileTrue(new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)));
-
-    // RobotModeTriggers.teleop().and(new Trigger(() -> !isCollisionWarning()))
-    // new Trigger(() -> Robot.robotIsTeleop() && (isCollisionWarning() == false))
-    //    .whileTrue(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
-    leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
-    /*
-    new Trigger(() -> DriverStation.isTeleopEnabled() && (isCollisionWarning() == false))
-        .whileTrue(new BreathLeds(leds, Color.kMagenta));
-    */
-    /*
-    RobotModeTriggers.teleop().whileTrue(new ConditionalCommand(
-        new LightningFlash(leds, Color.kRed).andThen(new BreathLeds(leds, Color.kRed)),
-        new BreathLeds(leds, pieceTypeSwitcher::getPieceColor),
-        this::isCollisionWarning
-    ));
-    */
-
   }
 
   /**

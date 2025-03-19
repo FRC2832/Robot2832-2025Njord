@@ -69,7 +69,8 @@ public class OperatorControls {
   public Trigger getHomeElevator() {
     return new Trigger(
         () -> {
-          return operator.getPOV() == 0 || operator.getPOV() == 315 || operator.getPOV() == 45;
+          int pov = operator.getPOV();
+          return pov == 0 || pov == 315 || pov == 45;
         });
   }
 }

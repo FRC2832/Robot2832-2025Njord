@@ -58,4 +58,44 @@ public class DriverControls {
   public Trigger driveToPole() {
     return new Trigger(driverRight::getTrigger);
   }
+
+  public double getClimbPercent() {
+    int pov = driverLeft.getPOV();
+    double request;
+    if (pov == 0 || pov == 315 || pov == 45) {
+      request = 0.25;
+    } else if (pov == 180 || pov == 225 || pov == 135) {
+      request = -0.25;
+    } else {
+      request = 0;
+    }
+    return request;
+  }
+
+  public Trigger getClimbRequest() {
+    return new Trigger(
+        () -> {
+          return Math.abs(getClimbPercent()) > 0.02;
+        });
+  }
+
+  public double getRampPercent() {
+    int pov = driverRight.getPOV();
+    double request;
+    if (pov == 0 || pov == 315 || pov == 45) {
+      request = 0.25;
+    } else if (pov == 180 || pov == 225 || pov == 135) {
+      request = -0.25;
+    } else {
+      request = 0;
+    }
+    return request;
+  }
+
+  public Trigger getRampRequest() {
+    return new Trigger(
+        () -> {
+          return Math.abs(getRampPercent()) > 0.02;
+        });
+  }
 }
