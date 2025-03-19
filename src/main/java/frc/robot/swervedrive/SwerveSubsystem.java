@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
+import frc.robot.logging.LoggedNetworkStruct;
 import frc.robot.simulation.RobotSim;
 import frc.robot.vision.Vision;
 import frc.robot.vision.Vision.Poles;
@@ -81,6 +82,9 @@ public class SwerveSubsystem extends SubsystemBase {
   private DoubleSubscriber maxSpeed;
 
   private Vision vision;
+
+  @SuppressWarnings("unused")
+  LoggedNetworkStruct<Pose2d> poseLog;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -131,6 +135,8 @@ public class SwerveSubsystem extends SubsystemBase {
       new TalonFXMotor(
           module.configuration.name + "_turn", (TalonFX) module.getAngleMotor().getMotor(), true);
     }
+
+    poseLog = new LoggedNetworkStruct<Pose2d>("/Swerve/Frame Pose", Pose2d.struct, new Pose2d());
   }
 
   @Override

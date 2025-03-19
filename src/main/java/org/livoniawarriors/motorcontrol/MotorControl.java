@@ -1,5 +1,7 @@
 package org.livoniawarriors.motorcontrol;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -61,6 +63,24 @@ abstract class MotorControl implements IMotorControl {
     faultsPub = motorTable.getStringTopic("Faults").publish();
     stickyPub = motorTable.getStringTopic("Sticky Faults").publish();
     versionPub = motorTable.getStringTopic("Version").publish();
+
+    //AdvantageKit logging
+    Logger.recordOutput("/Motors/" + name + "/Supply Voltage", () -> getSupplyVoltage());
+    Logger.recordOutput("/Motors/" + name + "/Supply Current", () -> getSupplyCurrent());
+    Logger.recordOutput("/Motors/" + name + "/Motor Voltage", () -> getMotorVoltage());
+    Logger.recordOutput("/Motors/" + name + "/Position", () -> getPosition());
+    Logger.recordOutput("/Motors/" + name + "/Velocity", () -> getVelocity());
+    Logger.recordOutput("/Motors/" + name + "/Raw Position",  () -> getMotorPosition());
+    Logger.recordOutput("/Motors/" + name + "/Raw Velocity", () -> getMotorVelocity());
+    Logger.recordOutput("/Motors/" + name + "/RPM", () -> getRpm());
+    Logger.recordOutput("/Motors/" + name + "/Temperature", () -> getMotorTemp());
+    Logger.recordOutput("/Motors/" + name + "/At Setpoint", () -> atSetpoint());
+    Logger.recordOutput("/Motors/" + name + "/Connected", () -> isConnected());
+    Logger.recordOutput("/Motors/" + name + "/Faulted", () -> isFaulted());
+    Logger.recordOutput("/Motors/" + name + "/Faults", getFaults());
+    Logger.recordOutput("/Motors/" + name + "/Sticky Faults", getStickyFaults());
+    Logger.recordOutput("/Motors/" + name + "/Version", getVersion());
+    
   }
 
   protected void customLogging() {}

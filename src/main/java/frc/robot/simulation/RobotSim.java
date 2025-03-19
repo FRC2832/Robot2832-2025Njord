@@ -1,5 +1,13 @@
 package frc.robot.simulation;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -10,9 +18,8 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
+import frc.robot.logging.LoggedNetworkStruct;
+import frc.robot.logging.LoggedNetworkStructArray;
 import swervelib.math.Matter;
 
 // you cannot pass in an array of components, each component must be independent.
@@ -30,6 +37,7 @@ public class RobotSim implements Runnable {
   DoubleEntry testX, testY, testZ, testRoll, testPitch, testYaw;
   Supplier<Pose2d> driveSupplier;
   static List<Matter> matter;
+  LinkedList<LoggedNetworkInput> loggedValues = new LinkedList<>();
   // this is the height where the claw pivot sits at rest
   static final double INITIAL_HEIGHT = 16.625;
 
@@ -38,18 +46,27 @@ public class RobotSim implements Runnable {
     var inst = NetworkTableInstance.getDefault();
     zeroPub = inst.getStructTopic("/Simulation/ZeroPose", Pose3d.struct).publish();
     zeroPub.set(new Pose3d());
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/ZeroPose", Pose3d.struct, new Pose3d()));
     testPub = inst.getStructTopic("/Simulation/TestPose", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/TestPose", Pose3d.struct, new Pose3d()));
     drivetrainPub = inst.getStructTopic("/Simulation/DrivePose", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/DrivePose", Pose3d.struct, new Pose3d()));
     elevatorPub = inst.getStructTopic("/Simulation/ElevatorPose", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/ElevatorPose", Pose3d.struct, new Pose3d()));
     carriagePub = inst.getStructTopic("/Simulation/CarriagePose", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/CarriagePose", Pose3d.struct, new Pose3d()));
     clawPub = inst.getStructTopic("/Simulation/ClawPose", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/ClawPose", Pose3d.struct, new Pose3d()));
     coralPub = inst.getStructArrayTopic("/Simulation/CoralPoses", Pose3d.struct).publish();
+    loggedValues.add(new LoggedNetworkStructArray<Pose3d>("/Simulation/CoralPoses", Pose3d.struct));
 
     // NT values to allow the model to be changed
     heightSub = inst.getDoubleTopic("/Simulation/Claw Height").getEntry(INITIAL_HEIGHT);
     heightSub.set(INITIAL_HEIGHT);
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/Claw Height", INITIAL_HEIGHT));
     clawSub = inst.getDoubleTopic("/Simulation/Claw Angle").getEntry(0);
     clawSub.set(0);
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/Claw Angle", 0));
 
     testX = inst.getDoubleTopic("/Simulation/TestPose/X").getEntry(0);
     testY = inst.getDoubleTopic("/Simulation/TestPose/Y").getEntry(0);
@@ -57,6 +74,7 @@ public class RobotSim implements Runnable {
     testRoll = inst.getDoubleTopic("/Simulation/TestPose/Roll").getEntry(0);
     testPitch = inst.getDoubleTopic("/Simulation/TestPose/Pitch").getEntry(0);
     testYaw = inst.getDoubleTopic("/Simulation/TestPose/Yaw").getEntry(0);
+
     // have to initialize all values so they appear in NT
     testX.set(0);
     testY.set(0);
@@ -64,6 +82,13 @@ public class RobotSim implements Runnable {
     testRoll.set(0);
     testPitch.set(0);
     testYaw.set(0);
+    
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/X", 0));
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Y", 0));
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Z", 0));
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Roll", 0));
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Pitch", 0));
+    loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Yaw", 0));
     // set bumper distances
   }
 

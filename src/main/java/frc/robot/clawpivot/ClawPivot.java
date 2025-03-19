@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.livoniawarriors.UtilFunctions;
 
 public abstract class ClawPivot extends SubsystemBase {
@@ -37,6 +38,8 @@ public abstract class ClawPivot extends SubsystemBase {
   boolean collisionWarning;
 
   private HashMap<ScoringPositions, DoubleSupplier> positions;
+  @SuppressWarnings("unused")
+  private LoggedNetworkNumber clawLog;
 
   public ClawPivot() {
     super();
@@ -48,6 +51,7 @@ public abstract class ClawPivot extends SubsystemBase {
     clawPub =
         NetworkTableInstance.getDefault().getDoubleTopic("/Simulation/Claw Angle").getEntry(0);
     positions = new HashMap<>();
+    clawLog = new LoggedNetworkNumber("/Simulation/Claw Angle");
     // these position numbers are completely made up
     positions.put(ScoringPositions.L1Coral, UtilFunctions.getSettingSub("ClawPos/L1Coral", 20));
     positions.put(ScoringPositions.L2Coral, UtilFunctions.getSettingSub("ClawPos/L2Coral", 24.7));
