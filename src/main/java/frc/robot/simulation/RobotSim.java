@@ -58,7 +58,7 @@ public class RobotSim implements Runnable {
     clawPub = inst.getStructTopic("/Simulation/ClawPose", Pose3d.struct).publish();
     loggedValues.add(new LoggedNetworkStruct<Pose3d>("/Simulation/ClawPose", Pose3d.struct, new Pose3d()));
     coralPub = inst.getStructArrayTopic("/Simulation/CoralPoses", Pose3d.struct).publish();
-    loggedValues.add(new LoggedNetworkStructArray<Pose3d>("/Simulation/CoralPoses", Pose3d.struct));
+    loggedValues.add(new LoggedNetworkStructArray<Pose3d>("/Simulation/CoralPoses", Pose3d.struct, new Pose3d[0]));
 
     // NT values to allow the model to be changed
     heightSub = inst.getDoubleTopic("/Simulation/Claw Height").getEntry(INITIAL_HEIGHT);
@@ -82,7 +82,7 @@ public class RobotSim implements Runnable {
     testRoll.set(0);
     testPitch.set(0);
     testYaw.set(0);
-    
+
     loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/X", 0));
     loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Y", 0));
     loggedValues.add(new LoggedNetworkNumber("/Simulation/TestPose/Z", 0));
