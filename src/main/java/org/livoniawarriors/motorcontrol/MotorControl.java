@@ -1,5 +1,8 @@
 package org.livoniawarriors.motorcontrol;
 
+import java.util.HashMap;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -65,22 +68,42 @@ abstract class MotorControl implements IMotorControl {
     versionPub = motorTable.getStringTopic("Version").publish();
 
     //AdvantageKit logging
-    Logger.recordOutput("/Motors/" + name + "/Supply Voltage", () -> getSupplyVoltage());
-    Logger.recordOutput("/Motors/" + name + "/Supply Current", () -> getSupplyCurrent());
-    Logger.recordOutput("/Motors/" + name + "/Motor Voltage", () -> getMotorVoltage());
-    Logger.recordOutput("/Motors/" + name + "/Position", () -> getPosition());
-    Logger.recordOutput("/Motors/" + name + "/Velocity", () -> getVelocity());
-    Logger.recordOutput("/Motors/" + name + "/Raw Position",  () -> getMotorPosition());
-    Logger.recordOutput("/Motors/" + name + "/Raw Velocity", () -> getMotorVelocity());
-    Logger.recordOutput("/Motors/" + name + "/RPM", () -> getRpm());
-    Logger.recordOutput("/Motors/" + name + "/Temperature", () -> getMotorTemp());
-    Logger.recordOutput("/Motors/" + name + "/At Setpoint", () -> atSetpoint());
-    Logger.recordOutput("/Motors/" + name + "/Connected", () -> isConnected());
-    Logger.recordOutput("/Motors/" + name + "/Faulted", () -> isFaulted());
-    Logger.recordOutput("/Motors/" + name + "/Faults", getFaults());
-    Logger.recordOutput("/Motors/" + name + "/Sticky Faults", getStickyFaults());
-    Logger.recordOutput("/Motors/" + name + "/Version", getVersion());
-    
+    Logger.recordOutput("/Motors/" + name + "/Supply Current", () -> logValues.supplyCurrent);
+    Logger.recordOutput("/Motors/" + name + "/Supply Voltage", () -> logValues.supplyVoltage);
+    Logger.recordOutput("/Motors/" + name + "/Motor Voltage", () -> logValues.motorVoltage);
+    Logger.recordOutput("/Motors/" + name + "/Position", () -> logValues.position);
+    Logger.recordOutput("/Motors/" + name + "/Velocity", () -> logValues.velocity);
+    Logger.recordOutput("/Motors/" + name + "/Raw Position",  () -> logValues.motorPosition);
+    Logger.recordOutput("/Motors/" + name + "/Raw Velocity", () -> logValues.motorVelocity);
+    Logger.recordOutput("/Motors/" + name + "/RPM", () -> logValues.rpm);
+    Logger.recordOutput("/Motors/" + name + "/Temperature", () -> logValues.motorTemp);
+    Logger.recordOutput("/Motors/" + name + "/At Setpoint", () -> logValues.atSetpoint);
+    Logger.recordOutput("/Motors/" + name + "/Connected", () -> logValues.isConnected);
+    Logger.recordOutput("/Motors/" + name + "/Faulted", () -> logValues.isFaulted);
+    Logger.recordOutput("/Motors/" + name + "/Faults", logValues.faults);
+    Logger.recordOutput("/Motors/" + name + "/Sticky Faults", logValues.stickyFaults);
+    Logger.recordOutput("/Motors/" + name + "/Version", logValues.version);
+  }
+  
+  MotorLogValues logValues = new MotorLogValues();
+
+  //update the values for advantagekit logging, for logging intermittently
+  public void updateLogValues(){
+    logValues.supplyCurrent = getSupplyCurrent();
+    logValues.supplyVoltage = getSupplyVoltage();
+    logValues.motorVoltage = getMotorVoltage();
+    logValues.position = getPosition();
+    logValues.velocity = getVelocity();
+    logValues.motorPosition = getMotorPosition();
+    logValues.motorVelocity = getMotorVelocity();
+    logValues.rpm = getRpm();
+    logValues.motorTemp = getMotorTemp();
+    logValues.atSetpoint = atSetpoint();
+    logValues.isConnected = isConnected();
+    logValues.isFaulted = isFaulted();
+    logValues.faults = getFaults();
+    logValues.stickyFaults = getStickyFaults();
+    logValues.version = getVersion();
   }
 
   protected void customLogging() {}
@@ -103,7 +126,8 @@ abstract class MotorControl implements IMotorControl {
     rawVeloPub.set(getMotorVelocity());
     rpmPub.set(getRpm());
     tempPub.set(getMotorTemp());
-
+    //advantagekit logging
+    updateLogValues();
     customLogging();
   }
 
