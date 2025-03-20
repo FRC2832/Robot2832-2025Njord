@@ -288,10 +288,10 @@ public class RobotContainer {
         .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
-    intake
-        .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
-        .whileTrue(intake.homeCoral(op::getIntakeRequest));
-
+    /*intake
+            .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
+            .whileTrue(intake.homeCoral(op::getIntakeRequest));
+    */
     // pid control
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));

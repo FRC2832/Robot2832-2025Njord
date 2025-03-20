@@ -49,18 +49,18 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command driveIntake(DoubleSupplier pct, BooleanSupplier isCoral) {
     return run(
         () -> {
-          var speed = pct.getAsDouble() * 16;
+          var speed = pct.getAsDouble() * 0.1;
           if (isCoral.getAsBoolean()) {
             speed *= -1;
           }
-          setVelocity(speed);
+          setPower(speed);
         });
   }
 
   public Command driveIntakeFast(BooleanSupplier isCoral, DoubleSupplier clawAngle) {
     return run(
         () -> {
-          var pct = 0.65;
+          var pct = 0.85;
           if (isCoral.getAsBoolean() && clawAngle.getAsDouble() < 100) {
             pct *= -1;
           }
