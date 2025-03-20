@@ -288,6 +288,7 @@ public class AprilTagCamera {
     }
   }
 
+  private ArrayList<PhotonTrackedTarget> tagsToRemove = new ArrayList<PhotonTrackedTarget>();
   /**
    * The latest estimated robot pose on the field from vision data. This may be empty. This should
    * only be called once per loop.
@@ -301,6 +302,23 @@ public class AprilTagCamera {
   private void updateEstimatedGlobalPose() {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
     for (var change : resultsList) {
+      tagsToRemove.clear();
+      for (var tag : change.targets) {
+        lastTagTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+        double dist = UtilFunctions.getDistance(tag.bestCameraToTarget);
+        if (tag.fiducialId == 12) {
+          distTo12 = dist;
+        }
+        if (tag.fiducialId == 18) {
+          distTo18 = dist;
+        }
+        if (dist < 0.7) {
+          tagsToRemove.add(tag);
+        }
+      }
+      for (var tag : tagsToRemove) {
+        change.targets.remove(tag);
+      }
       visionEst = poseEstimator.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
 
@@ -311,15 +329,6 @@ public class AprilTagCamera {
         latencyAlert.set(false);
       }
 
-      for (var tag : change.targets) {
-        lastTagTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
-        if (tag.fiducialId == 12) {
-          distTo12 = UtilFunctions.getDistance(tag.bestCameraToTarget);
-        }
-        if (tag.fiducialId == 18) {
-          distTo18 = UtilFunctions.getDistance(tag.bestCameraToTarget);
-        }
-      }
       numTagsSeen = change.targets.size();
     }
     estimatedRobotPose = visionEst;

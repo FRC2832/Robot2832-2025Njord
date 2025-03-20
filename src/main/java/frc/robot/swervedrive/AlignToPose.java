@@ -27,10 +27,10 @@ public class AlignToPose extends Command {
     lastHeading = pose.getRotation().getDegrees();
 
     xController.setSetpoint(pose.getX());
-    xController.setTolerance(Units.inchesToMeters(0.5));
+    xController.setTolerance(Units.inchesToMeters(0.35));
 
     yController.setSetpoint(pose.getY());
-    yController.setTolerance(Units.inchesToMeters(0.5));
+    yController.setTolerance(Units.inchesToMeters(0.35));
   }
 
   @Override
