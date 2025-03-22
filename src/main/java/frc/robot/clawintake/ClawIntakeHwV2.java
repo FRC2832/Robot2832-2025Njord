@@ -15,6 +15,11 @@ public class ClawIntakeHwV2 extends ClawIntake {
     intakeMotor = new SparkFlexMotor("Intake", 59);
     pieceSensor = new LaserCan(2);
 
+    intakeMotor.pidConstants.kP = 0.000001;
+    intakeMotor.pidConstants.kI = 0;
+    intakeMotor.pidConstants.kV = 1. / 565.;
+    intakeMotor.configurePid();
+
     // filter out the noisy distance sensor
     filter = LinearFilter.singlePoleIIR(0.06, 0.02);
   }
@@ -26,7 +31,7 @@ public class ClawIntakeHwV2 extends ClawIntake {
 
   @Override
   public boolean hasCoral() {
-    return 0 <= distance && distance < 40;
+    return 0 <= distance && distance < 10;
   }
 
   @Override
@@ -37,6 +42,11 @@ public class ClawIntakeHwV2 extends ClawIntake {
   @Override
   void setVelocity(double velocity) {
     intakeMotor.setVelocity(velocity);
+  }
+
+  @Override
+  void setRpm(double rpm) {
+    intakeMotor.setRpm(rpm);
   }
 
   @Override

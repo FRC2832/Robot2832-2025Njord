@@ -73,4 +73,7 @@ public class ClawIntakeSim extends ClawIntake {
   double getVelocity() {
     return 0;
   }
+
+  @Override
+  void setRpm(double rpm) {}
 }

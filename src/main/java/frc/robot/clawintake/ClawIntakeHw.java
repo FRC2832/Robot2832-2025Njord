@@ -61,4 +61,9 @@ public class ClawIntakeHw extends ClawIntake {
   double getVelocity() {
     return intakeMotor.getVelocity();
   }
+
+  @Override
+  void setRpm(double rpm) {
+    intakeMotor.setRpm(rpm);
+  }
 }

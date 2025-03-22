@@ -14,6 +14,8 @@ public abstract class ClawIntake extends SubsystemBase {
 
   abstract void setVelocity(double velocity);
 
+  abstract void setRpm(double rpm);
+
   abstract void setPosition(double position);
 
   abstract double getPosition();
@@ -49,11 +51,12 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command driveIntake(DoubleSupplier pct, BooleanSupplier isCoral) {
     return run(
         () -> {
-          var speed = pct.getAsDouble() * 0.1;
+          // convert to max of 5000 rpm
+          var speed = pct.getAsDouble() * 0.012 * 5000.;
           if (isCoral.getAsBoolean()) {
             speed *= -1;
           }
-          setPower(speed);
+          setVelocity(speed);
         });
   }
 

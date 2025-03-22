@@ -254,12 +254,12 @@ class SparkBaseMotor extends MotorControl {
 
   @Override
   public void setVelocity(double velocity) {
-    pid.setReference(velocity, ControlType.kMAXMotionVelocityControl);
+    pid.setReference(velocity, ControlType.kVelocity);
   }
 
   @Override
   public void setPosition(double position) {
-    pid.setReference(position, ControlType.kMAXMotionPositionControl);
+    pid.setReference(position, ControlType.kPosition);
   }
 
   @Override
@@ -304,13 +304,14 @@ class SparkBaseMotor extends MotorControl {
     cfg.closedLoop.d(pidConstants.kD, slot);
     cfg.closedLoop.velocityFF(pidConstants.kV, slot);
     cfg.closedLoop.iZone(pidConstants.kiZone, slot);
-    cfg.closedLoop.maxMotion.allowedClosedLoopError(pidConstants.kiError, slot);
-    cfg.closedLoop.maxMotion.maxVelocity(pidConstants.kVelMax, slot);
-    cfg.closedLoop.maxMotion.maxAcceleration(pidConstants.kAccelMax, slot);
+    // cfg.closedLoop.maxMotion.allowedClosedLoopError(pidConstants.kiError, slot);
+    // cfg.closedLoop.maxMotion.maxVelocity(pidConstants.kVelMax, slot);
+    // cfg.closedLoop.maxMotion.maxAcceleration(pidConstants.kAccelMax, slot);
     // missing: kS, kG, kA
 
     var statusCode =
         motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    statusCode = statusCode;
   }
 
   @Override
