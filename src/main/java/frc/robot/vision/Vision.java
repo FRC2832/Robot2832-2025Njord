@@ -133,6 +133,8 @@ public class Vision extends SubsystemBase {
    */
   @Override
   public void periodic() {
+    calcClosestPole();
+
     if (SwerveDriveTelemetry.isSimulation && swerve.getSimulationDriveTrainPose().isPresent()) {
       /*
        * In the maple-sim, odometry is simulated using encoder values, accounting for factors like skidding and drifting.
@@ -323,5 +325,29 @@ public class Vision extends SubsystemBase {
     } else {
       return bluePoses;
     }
+  }
+
+  private Pose2d closestPole = new Pose2d();
+
+  private void calcClosestPole() {
+    // find closest pole
+    var poles = getPoles(swerve.isRedAlliance());
+    var closePole = Poles.PoleA;
+    var currentPose = swerve.getPose();
+    var closeDist = UtilFunctions.getDistance(currentPose, poles.get(closePole));
+
+    for (var key : poles.keySet()) {
+      var newDist = UtilFunctions.getDistance(currentPose, poles.get(key));
+      if (newDist < closeDist) {
+        closeDist = newDist;
+        closePole = key;
+      }
+    }
+
+    closestPole = poles.get(closePole);
+  }
+
+  public Pose2d getClosestPole() {
+    return closestPole;
   }
 }

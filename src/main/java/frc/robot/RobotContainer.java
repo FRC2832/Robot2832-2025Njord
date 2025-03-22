@@ -40,6 +40,7 @@ import frc.robot.controllers.OperatorControls;
 import frc.robot.elevator.Elevator;
 import frc.robot.elevator.ElevatorHw;
 import frc.robot.elevator.ElevatorSimul;
+import frc.robot.leds.FrontLeds;
 import frc.robot.piecetypeswitcher.PieceTypeSwitcher;
 import frc.robot.piecetypeswitcher.ScoringPositions;
 import frc.robot.ramp.Ramp;
@@ -48,6 +49,7 @@ import frc.robot.simulation.RobotSim;
 import frc.robot.swervedrive.AlignToPose;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
+import frc.robot.vision.DistToTarget;
 import frc.robot.vision.Vision;
 import frc.robot.vision.Vision.Poles;
 import java.io.File;
@@ -55,7 +57,7 @@ import java.util.Set;
 import org.livoniawarriors.LoopTimeLogger;
 import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
-import org.livoniawarriors.leds.LedSubsystem;
+import org.livoniawarriors.leds.ILedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
 import org.livoniawarriors.motorcontrol.MotorControls;
 
@@ -71,7 +73,7 @@ public class RobotContainer {
 
   // private FrontLeds frontLeds;
   // private RearLeds rearLeds;
-  private LedSubsystem leds;
+  private ILedSubsystem leds;
   private Vision vision;
   private Elevator elevator;
   private ClawPivot pivot;
@@ -120,7 +122,8 @@ public class RobotContainer {
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     // frontLeds = new FrontLeds(0, 54);
     // rearLeds = new RearLeds(frontLeds);
-    leds = new LedSubsystem(0, 320);
+    leds = new FrontLeds(0, 320);
+    // leds = new LedSubsystem(0, 320);
     pieceTypeSwitcher = new PieceTypeSwitcher();
 
     if (Robot.isSimulation()) {
@@ -243,6 +246,8 @@ public class RobotContainer {
     robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new DriverFeedback(), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new RobotSim(swerveDrive::getPose), Robot.kDefaultPeriod, 0);
+    robot.addPeriodic(
+        new DistToTarget(vision::getClosestPole, swerveDrive::getPose), Robot.kDefaultPeriod, 0);
 
     new LoopTimeLogger(robot, NetworkTableInstance.getDefault().getTable("Task Timings (ms)"));
     CanBridge.runTCP();

@@ -47,7 +47,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Robot;
 import frc.robot.simulation.RobotSim;
 import frc.robot.vision.Vision;
-import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -860,20 +859,6 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   private Command alignToClosePole(ILedSubsystem leds) {
-    // find closest pole
-    var poles = vision.getPoles(isRedAlliance());
-    var closePole = Poles.PoleA;
-    var currentPose = getPose();
-    var closeDist = UtilFunctions.getDistance(currentPose, poles.get(closePole));
-
-    for (var key : poles.keySet()) {
-      var newDist = UtilFunctions.getDistance(currentPose, poles.get(key));
-      if (newDist < closeDist) {
-        closeDist = newDist;
-        closePole = key;
-      }
-    }
-
-    return alignToPose(poles.get(closePole)).andThen(new LightningFlash(leds, Color.kPurple));
+    return alignToPose(vision.getClosestPole()).andThen(new LightningFlash(leds, Color.kPurple));
   }
 }
