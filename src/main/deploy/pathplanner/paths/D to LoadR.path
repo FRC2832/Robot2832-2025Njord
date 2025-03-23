@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.953,
-        "y": 2.792
+        "x": 3.8360655737704916,
+        "y": 2.5145491803278683
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.539758187946081,
-        "y": 3.2441561097131855
+        "x": 4.422823761716573,
+        "y": 2.966705290041054
       },
       "isLocked": false,
       "linkedName": "L4 Pole D"
     },
     {
       "anchor": {
-        "x": 1.429,
-        "y": 0.844
+        "x": 1.0908811475409836,
+        "y": 1.0400614754098354
       },
       "prevControl": {
-        "x": 1.1980684897358262,
-        "y": 0.6684072926877934
+        "x": 0.8599496372768098,
+        "y": 0.8644687680976288
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 52.50000000000001
+    "rotation": 54.46232220802558
   },
   "reversed": false,
   "folder": null,

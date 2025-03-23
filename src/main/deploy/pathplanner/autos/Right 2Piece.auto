@@ -9,34 +9,28 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "Right to E"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Right to E"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "FineDriveE"
+                      }
+                    }
+                  ]
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "ElevatorL4Coral"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "FineDriveE"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 8.0
                 }
               }
             ]
@@ -117,12 +111,6 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "LoadR to D"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "ElevatorL4Coral"
@@ -133,24 +121,24 @@
                 "data": {
                   "name": "HomeCoral"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "FineDriveD"
-                }
               },
               {
-                "type": "wait",
+                "type": "sequential",
                 "data": {
-                  "waitTime": 8.0
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "LoadR to D"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "FineDriveD"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -231,12 +219,6 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "LoadR to D"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "ElevatorL4Coral"
@@ -247,24 +229,24 @@
                 "data": {
                   "name": "HomeCoral"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "FineDriveK"
-                }
               },
               {
-                "type": "wait",
+                "type": "sequential",
                 "data": {
-                  "waitTime": 8.0
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "LoadR to C"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "FineDriveC"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -283,7 +265,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "D to LoadR"
+                  "pathName": "C to LoadR"
                 }
               },
               {

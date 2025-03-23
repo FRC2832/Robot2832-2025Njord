@@ -200,14 +200,17 @@ public class RobotContainer {
         "LoadFromHP", new ConditionalCommand(LoadFromHp(), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("PushPartner", swerveDrive.pushPartner());
     NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
-    NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
-    NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
+    // disabling shake as it is too violent
+    // NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
+    // NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
+    NamedCommands.registerCommand("ShakeRobotLeft", new WaitCommand(15));
+    NamedCommands.registerCommand("ShakeRobotRight", new WaitCommand(15));
     NamedCommands.registerCommand(
         "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
         "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
-        "ScoreCoral", intake.driveIntake(() -> 1, () -> true).withTimeout(1));
+        "ScoreCoral", intake.driveIntakeFast(() -> true, pivot::getAngle).withTimeout(.5));
     NamedCommands.registerCommand(
         "HomeCoral",
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
@@ -293,10 +296,10 @@ public class RobotContainer {
         .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
-    /*intake
-            .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
-            .whileTrue(intake.homeCoral(op::getIntakeRequest));
-    */
+    intake
+        .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
+        .whileTrue(intake.homeCoral(op::getIntakeRequest));
+
     // pid control
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
         .whileTrue(setScoringPosition(ScoringPositions.L1Coral));

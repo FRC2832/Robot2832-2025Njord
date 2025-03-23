@@ -18,19 +18,19 @@ public class AlignToPose extends Command {
     this.drive = swerve;
     noSpeeds = new ChassisSpeeds();
 
-    xController = new PIDController(3, 0, 0); // Vertical movement
-    yController = new PIDController(3, 0, 0); // Horitontal movement
-    rotController = new PIDController(0.04, 0, 0); // Rotation
+    xController = new PIDController(3.1, 0.02, 0); // Vertical movement
+    yController = new PIDController(3.1, 0.02, 0); // Horitontal movement
+    rotController = new PIDController(0.05, 0.0004, 0); // Rotation
 
     rotController.setSetpoint(pose.getRotation().getDegrees());
-    rotController.setTolerance(1);
+    rotController.setTolerance(2);
     lastHeading = pose.getRotation().getDegrees();
 
     xController.setSetpoint(pose.getX());
-    xController.setTolerance(Units.inchesToMeters(0.5));
+    xController.setTolerance(Units.inchesToMeters(0.8));
 
     yController.setSetpoint(pose.getY());
-    yController.setTolerance(Units.inchesToMeters(0.5));
+    yController.setTolerance(Units.inchesToMeters(0.8));
   }
 
   @Override
