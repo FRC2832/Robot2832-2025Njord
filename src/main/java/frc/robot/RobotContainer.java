@@ -174,8 +174,8 @@ public class RobotContainer {
             new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(-45)),
             new Translation3d(
                 Units.inchesToMeters(13.25), Units.inchesToMeters(10.5), Units.inchesToMeters(8.5)),
-            VecBuilder.fill(4, 4, 8),
-            VecBuilder.fill(0.5, 0.5, 1));
+            VecBuilder.fill(3.5, 3.5, 7),
+            VecBuilder.fill(0.4, 0.4, 0.8));
 
     rightCamera =
         new AprilTagCamera(
@@ -185,8 +185,8 @@ public class RobotContainer {
                 Units.inchesToMeters(13.25),
                 Units.inchesToMeters(-10.5),
                 Units.inchesToMeters(8.5)),
-            VecBuilder.fill(4, 4, 8),
-            VecBuilder.fill(0.5, 0.5, 1));
+            VecBuilder.fill(3.5, 3.5, 7),
+            VecBuilder.fill(0.4, 0.4, 0.8));
 
     // vision.addCamera(frontCamera);
     // vision.addCamera(backCamera);

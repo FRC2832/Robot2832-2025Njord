@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.47,
-        "y": 7.32
+        "x": 1.2107581967213117,
+        "y": 7.08186475409836
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4959441897644448,
-        "y": 6.5140720840515245
+        "x": 2.2193017649195124,
+        "y": 6.48152911765057
       },
       "isLocked": false,
       "linkedName": "Load Zone Left"
     },
     {
       "anchor": {
-        "x": 3.984,
-        "y": 5.247
+        "x": 3.788114754098361,
+        "y": 5.463524590163933
       },
       "prevControl": {
-        "x": 3.3761547110252703,
-        "y": 5.738536711762011
+        "x": 3.01091233678453,
+        "y": 5.944014051101741
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.46011396011396405,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -41,7 +55,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.0,
     "rotation": -59.99999999999999
   },
   "reversed": false,

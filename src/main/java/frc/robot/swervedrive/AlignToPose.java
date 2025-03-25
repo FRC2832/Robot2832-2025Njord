@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AlignToPose extends Command {
@@ -13,9 +14,12 @@ public class AlignToPose extends Command {
   private boolean atSetpoint;
   private ChassisSpeeds noSpeeds;
   private double lastHeading;
+  private Pose2d target;
+  private int counts;
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose) {
     this.drive = swerve;
+    this.target = pose;
     noSpeeds = new ChassisSpeeds();
 
     xController = new PIDController(3.1, 0.02, 0); // Vertical movement
@@ -23,26 +27,34 @@ public class AlignToPose extends Command {
     rotController = new PIDController(0.05, 0.0004, 0); // Rotation
 
     rotController.setSetpoint(pose.getRotation().getDegrees());
-    rotController.setTolerance(2);
+    rotController.setTolerance(4);
     lastHeading = pose.getRotation().getDegrees();
 
     xController.setSetpoint(pose.getX());
-    xController.setTolerance(Units.inchesToMeters(0.8));
+    xController.setTolerance(Units.inchesToMeters(0.9));
 
     yController.setSetpoint(pose.getY());
-    yController.setTolerance(Units.inchesToMeters(0.8));
+    yController.setTolerance(Units.inchesToMeters(0.9));
   }
 
   @Override
   public void initialize() {
     atSetpoint = false;
+    counts = 0;
   }
 
   @Override
   public void execute() {
     Pose2d pose = drive.getPose();
+    var xError = Units.inchesToMeters(pose.getX() - target.getX());
+    var yError = Units.inchesToMeters(pose.getY() - target.getY());
+    var rotError = pose.getRotation().minus(target.getRotation()).getDegrees();
+
     double xSpeed = xController.calculate(pose.getX());
     double ySpeed = yController.calculate(pose.getY());
+    SmartDashboard.putNumber("Align XError", xError);
+    SmartDashboard.putNumber("Align YError", yError);
+    SmartDashboard.putNumber("Align RotError", rotError);
 
     // handle 360 circle problem
     double curHeading = pose.getRotation().getDegrees();
@@ -58,20 +70,20 @@ public class AlignToPose extends Command {
     }*/
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rotValue);
 
-    if (rotController.atSetpoint() && yController.atSetpoint() && xController.atSetpoint()) {
+    if (Math.abs(rotError) < 2 && Math.abs(xError) < 0.2 && Math.abs(yError) < 0.2) {
       atSetpoint = true;
+      counts++;
+    } else {
+      atSetpoint = false;
+      counts = 0;
     }
 
-    if (!atSetpoint) {
-      drive.driveFieldOriented(speeds);
-    } else {
-      drive.driveFieldOriented(noSpeeds);
-    }
+    drive.driveFieldOriented(speeds);
   }
 
   @Override
   public boolean isFinished() {
-    return atSetpoint;
+    return counts >= 25;
   }
 
   @Override
