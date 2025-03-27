@@ -29,7 +29,7 @@ public class PieceTypeSwitcher extends SubsystemBase {
   }
 
   public Command switchPieceSelected() {
-    return runOnce(this::togglePieceSelected);
+    return runOnce(this::togglePieceSelected).ignoringDisable(true);
   }
 
   public boolean isCoral() {

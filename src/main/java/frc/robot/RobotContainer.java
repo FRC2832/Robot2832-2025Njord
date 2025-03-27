@@ -234,6 +234,7 @@ public class RobotContainer {
 
     SmartDashboard.putData(
         "Clear Sticky Faults", new InstantCommand(MotorControls::ClearStickyFaults));
+    SmartDashboard.putData("Switch Piece", pieceTypeSwitcher.switchPieceSelected());
 
     SmartDashboard.putData("Play Song", new PlaySong(pivot));
     SmartDashboard.putData("Home Coral", intake.homeCoral(() -> 0.));
@@ -296,9 +297,9 @@ public class RobotContainer {
         .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
-    intake
-        .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
-        .whileTrue(intake.homeCoral(op::getIntakeRequest));
+    /*intake
+    .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
+    .whileTrue(intake.homeCoral(op::getIntakeRequest));*/
 
     // pid control
     new Trigger(() -> op.getL1Command() && pieceTypeSwitcher.isCoral())
