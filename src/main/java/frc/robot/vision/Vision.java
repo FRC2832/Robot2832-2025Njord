@@ -1,5 +1,6 @@
 package frc.robot.vision;
 
+import au.grapplerobotics.MitoCANdria;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -105,6 +106,16 @@ public class Vision extends SubsystemBase {
       visionSim.addAprilTags(fieldLayout);
 
       openSimCameraViews();
+    } else {
+      //force the camera power to be turned on every time we power up
+      try {
+        MitoCANdria mito = new MitoCANdria(0);
+        mito.setChannelEnabled(MitoCANdria.MITOCANDRIA_CHANNEL_5VA, true);
+        mito.setChannelEnabled(MitoCANdria.MITOCANDRIA_CHANNEL_5VB, true);
+        mito.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
