@@ -7,7 +7,7 @@ import org.livoniawarriors.ColorHSV;
 import org.livoniawarriors.leds.ILedSubsystem;
 
 public class FrontLeds implements ILedSubsystem {
-  static final int NUM_LEDS = 200;
+  static final int NUM_LEDS = 120;
   AddressableLED leds;
   AddressableLEDBuffer fullBuffer;
   AddressableLEDBuffer frontBuffer;

@@ -8,7 +8,6 @@ public class HomeCoral extends Command {
   private double startPos;
   private DoubleSupplier driverInput;
   private Stages stage;
-  private final double INTAKE_SPEED = -45;
 
   enum Stages {
     FindPiece,
@@ -36,22 +35,20 @@ public class HomeCoral extends Command {
   public void execute() {
     // coral intake is negative, so go a negative amount of revolutions
     if (stage == Stages.FindPiece) {
-      intake.setVelocity(INTAKE_SPEED);
+      intake.setVelocity(-15);
       if (intake.hasCoral()) {
         stage = Stages.MoveToEnd;
       }
     } else if (stage == Stages.MoveToEnd) {
-      intake.setVelocity(INTAKE_SPEED);
+      intake.setVelocity(-15);
       if (!intake.hasCoral()) {
         stage = Stages.DriveBack;
         startPos = intake.getPosition();
-        System.out.println(
-            "StartPos: " + startPos + " Command: " + (startPos - 5) + " Target: " + (startPos - 3));
       }
     } else if (stage == Stages.DriveBack) {
       // overshoot a little for the PID to react
-      intake.setVelocity(-INTAKE_SPEED);
-      if (intake.getPosition() > (startPos + 1)) {
+      intake.setPosition(startPos + 5);
+      if (intake.getPosition() > (startPos + 3)) {
         stage = Stages.Stop;
       }
     } else {

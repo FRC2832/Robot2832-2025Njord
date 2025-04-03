@@ -51,8 +51,7 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command driveIntake(DoubleSupplier pct, BooleanSupplier isCoral) {
     return run(
         () -> {
-          // convert to max of 5000 rpm
-          var speed = pct.getAsDouble() * 0.012 * 5000.;
+          var speed = pct.getAsDouble() * 16;
           if (isCoral.getAsBoolean()) {
             speed *= -1;
           }
@@ -63,11 +62,11 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command driveIntakeFast(BooleanSupplier isCoral, DoubleSupplier clawAngle) {
     return run(
         () -> {
-          var rpm = 400;
+          var pct = 0.65;
           if (isCoral.getAsBoolean() && clawAngle.getAsDouble() < 100) {
-            rpm *= -1;
+            pct *= -1;
           }
-          setVelocity(rpm);
+          setPower(pct);
         });
   }
 

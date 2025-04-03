@@ -107,7 +107,7 @@ public class Vision extends SubsystemBase {
 
       openSimCameraViews();
     } else {
-      //force the camera power to be turned on every time we power up
+      // force the camera power to be turned on every time we power up
       try {
         MitoCANdria mito = new MitoCANdria(0);
         mito.setChannelEnabled(MitoCANdria.MITOCANDRIA_CHANNEL_5VA, true);

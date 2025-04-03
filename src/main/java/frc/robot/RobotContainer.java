@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.clawintake.ClawIntake;
-import frc.robot.clawintake.ClawIntakeHwV2;
+import frc.robot.clawintake.ClawIntakeHw;
 import frc.robot.clawintake.ClawIntakeSim;
 import frc.robot.clawpivot.ClawPivot;
 import frc.robot.clawpivot.ClawPivotHw;
@@ -122,7 +122,7 @@ public class RobotContainer {
     swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
     // frontLeds = new FrontLeds(0, 54);
     // rearLeds = new RearLeds(frontLeds);
-    leds = new FrontLeds(0, 320);
+    leds = new FrontLeds(0, 124);
     // leds = new LedSubsystem(0, 320);
     pieceTypeSwitcher = new PieceTypeSwitcher();
 
@@ -136,7 +136,7 @@ public class RobotContainer {
       pivot = new ClawPivotSim();
     } else {
       swerveDrive.setMaximumSpeed(5, Math.toRadians(220));
-      intake = new ClawIntakeHwV2();
+      intake = new ClawIntakeHw();
       elevator = new ElevatorHw();
       pivot = new ClawPivotHw();
     }
