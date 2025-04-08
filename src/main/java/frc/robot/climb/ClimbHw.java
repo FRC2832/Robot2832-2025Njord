@@ -27,9 +27,9 @@ public class ClimbHw extends Climb {
     fx_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     fx_cfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     fx_cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    fx_cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.29;
-    fx_cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-    fx_cfg.Slot0.kP = 25;
+    fx_cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.280;
+    fx_cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.01;
+    fx_cfg.Slot0.kP = 30;
     fx_cfg.Slot0.kG = 0.5;
 
     rawMotor = (TalonFX) climbMotor.getBaseMotor();
@@ -44,10 +44,10 @@ public class ClimbHw extends Climb {
   @Override
   public void setPower(double power) {
     // climbMotor.setPower(power);
-    if (getAngle() < 0.24 || power < 0) {
+    if (getAngle() < 0.26 || power < 0) {
       climbMotor.setPower(power);
     } else {
-      rawMotor.setControl(positionSetter.withPosition(0.28));
+      rawMotor.setControl(positionSetter.withPosition(0.275));
     }
   }
 
