@@ -289,7 +289,7 @@ public class RobotContainer {
     ramp.setDefaultCommand(ramp.setPowerCmd(driver::getRampPercent));
     elevator.setDefaultCommand(elevator.holdElevator());
     pivot.setDefaultCommand(pivot.holdClawPivot());
-    intake.setDefaultCommand(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
+    intake.setDefaultCommand(intake.holdPiece());
     leds.setDefaultCommand(new BreathLeds(leds, pieceTypeSwitcher::getPieceColor));
 
     // operator control of claw/elevator
@@ -297,6 +297,8 @@ public class RobotContainer {
         .whileTrue(elevator.driveElevator(op::getElevatorRequest, pivot::getAngle));
     new Trigger(() -> Math.abs(op.getPivotRequest()) > 0.03)
         .whileTrue(pivot.drivePivot(op::getPivotRequest, elevator::getPosition));
+    new Trigger(() -> Math.abs(op.getIntakeRequest()) > 0.03)
+        .whileTrue(intake.driveIntake(op::getIntakeRequest, pieceTypeSwitcher::isCoral));
     /*intake
     .trigCoralHome(op::getIntakeRequest, pieceTypeSwitcher::isCoral)
     .whileTrue(intake.homeCoral(op::getIntakeRequest));*/

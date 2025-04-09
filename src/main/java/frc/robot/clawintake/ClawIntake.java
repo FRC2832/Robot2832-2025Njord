@@ -79,4 +79,8 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command homeCoral(DoubleSupplier driveCommand) {
     return new HomeCoral(this, driveCommand);
   }
+
+  public Command holdPiece() {
+    return new HoldPiece(this);
+  }
 }
