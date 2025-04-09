@@ -24,7 +24,7 @@ public class ClimbHw extends Climb {
     var fx_cfg = new TalonFXConfiguration();
     fx_cfg.Feedback.FeedbackRemoteSensorID = climbAngle.getDeviceID();
     fx_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    fx_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    fx_cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     fx_cfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     fx_cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     fx_cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.280;
