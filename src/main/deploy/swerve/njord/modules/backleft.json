@@ -5,12 +5,12 @@
   },
   "absoluteEncoderOffset": 106.1,
   "drive": {
-    "type": "krakenx60",
+    "type": "krakenx60foc",
     "id": 31,
     "canbus": "Njord"
   },
   "angle": {
-    "type": "krakenx60",
+    "type": "talonfx",
     "id": 32,
     "canbus": "Njord"
   },
