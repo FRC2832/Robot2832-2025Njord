@@ -55,7 +55,6 @@ import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.util.Set;
 import org.livoniawarriors.LoopTimeLogger;
-import org.livoniawarriors.PdpLoggerKit;
 import org.livoniawarriors.leds.BreathLeds;
 import org.livoniawarriors.leds.ILedSubsystem;
 import org.livoniawarriors.leds.LightningFlash;
@@ -246,8 +245,9 @@ public class RobotContainer {
         new AlignToPose(swerveDrive, new Pose2d(2, 2, Rotation2d.fromDegrees(60))));
 
     // periodic tasks to add
-    robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
-    robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
+    // turning off motor logging, we have hoot logs, and this is taking a lot of CPU time
+    // robot.addPeriodic(MotorControls::UpdateLogs, Robot.kDefaultPeriod, 0);
+    // robot.addPeriodic(new PdpLoggerKit(PDP_CHANNEL_NAMES), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new DriverFeedback(), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(new RobotSim(swerveDrive::getPose), Robot.kDefaultPeriod, 0);
     robot.addPeriodic(
