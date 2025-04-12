@@ -33,9 +33,7 @@ public class HoldPiece extends Command {
    * @param interrupted whether the command was interrupted/canceled
    */
   @Override
-  public void end(boolean interrupted) {
-
-  }
+  public void end(boolean interrupted) {}
 
   /**
    * Whether the command has finished. Once a command finishes, the scheduler will call its end()
