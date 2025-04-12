@@ -208,12 +208,12 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
-        "ElevatorLoadPos", setScoringPosition(ScoringPositions.LoadingPosition));
-    NamedCommands.registerCommand(
         "ScoreCoral", intake.driveIntakeFast(() -> true, pivot::getAngle).withTimeout(.5));
     NamedCommands.registerCommand(
         "HomeCoral",
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
+    NamedCommands.registerCommand("CoralMode", pieceTypeSwitcher.switchToCoral());
+    NamedCommands.registerCommand("AlgaeMode", pieceTypeSwitcher.switchToAlgae());
 
     NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
     NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));

@@ -32,6 +32,22 @@ public class PieceTypeSwitcher extends SubsystemBase {
     return runOnce(this::togglePieceSelected).ignoringDisable(true);
   }
 
+  public Command switchToAlgae() {
+    return runOnce(
+            () -> {
+              pieceSelected = "Algae";
+            })
+        .ignoringDisable(true);
+  }
+
+  public Command switchToCoral() {
+    return runOnce(
+            () -> {
+              pieceSelected = "Coral";
+            })
+        .ignoringDisable(true);
+  }
+
   public boolean isCoral() {
     return pieceSelected == "Coral";
   }
