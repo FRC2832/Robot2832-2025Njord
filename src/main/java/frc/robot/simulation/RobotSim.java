@@ -133,8 +133,8 @@ public class RobotSim implements Runnable {
     coralPub.set(new Pose3d[] {coral});
 
     matter = new ArrayList<Matter>();
-    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 57));
-    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 3));
+    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 45));
+    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 2));
   }
 
   /**
