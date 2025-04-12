@@ -191,6 +191,7 @@ public class RobotContainer {
     // vision.addCamera(backCamera);
     vision.addCamera(leftCamera);
     vision.addCamera(rightCamera);
+    vision.addCoralModeSupplier(pieceTypeSwitcher::isCoral);
 
     // add some buttons to press for development
 

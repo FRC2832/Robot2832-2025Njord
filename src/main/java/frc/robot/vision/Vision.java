@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.livoniawarriors.UtilFunctions;
@@ -50,6 +51,10 @@ public class Vision extends SubsystemBase {
   private HashMap<Poles, Pose2d> bluePoses = new HashMap<Vision.Poles, Pose2d>();
   private HashMap<Poles, Pose2d> redPoses = new HashMap<Vision.Poles, Pose2d>();
 
+  private HashMap<Algae, Pose2d> blueAlgae = new HashMap<Vision.Algae, Pose2d>();
+
+  private BooleanSupplier isCoralSupplier;
+
   public Vision(SwerveSubsystem swerve) {
     // register this subsystem with the command scheduler to have the periodic function called
     super();
@@ -69,6 +74,13 @@ public class Vision extends SubsystemBase {
     bluePoses.put(Poles.PoleJ, new Pose2d(4.990, 5.213, Rotation2d.fromDegrees(-120)));
     bluePoses.put(Poles.PoleK, new Pose2d(3.999, 5.212, Rotation2d.fromDegrees(-60)));
     bluePoses.put(Poles.PoleL, new Pose2d(3.713, 5.049, Rotation2d.fromDegrees(-60)));
+
+    blueAlgae.put(Algae.AlgaeAB, new Pose2d(3.104, 4.026, Rotation2d.fromDegrees(0)));
+    blueAlgae.put(Algae.AlgaeCD, new Pose2d(3.799, 2.823, Rotation2d.fromDegrees(60)));
+    blueAlgae.put(Algae.AlgaeEF, new Pose2d(5.190, 2.822, Rotation2d.fromDegrees(120)));
+    blueAlgae.put(Algae.AlgaeGH, new Pose2d(5.883, 4.011, Rotation2d.fromDegrees(179)));
+    blueAlgae.put(Algae.AlgaeIJ, new Pose2d(5.190, 5.230, Rotation2d.fromDegrees(-120)));
+    blueAlgae.put(Algae.AlgaeKL, new Pose2d(3.799, 5.230, Rotation2d.fromDegrees(-60)));
 
     // get red poles
     for (var pole : bluePoses.keySet()) {
@@ -91,6 +103,10 @@ public class Vision extends SubsystemBase {
         redPoses.put(Poles.PoleL, new Pose2d(3.714, 5.105, Rotation2d.fromDegrees(-60)));
     */
     init();
+  }
+
+  public void addCoralModeSupplier(BooleanSupplier coralMode) {
+    isCoralSupplier = coralMode;
   }
 
   public void addCamera(AprilTagCamera camera) {
@@ -298,6 +314,15 @@ public class Vision extends SubsystemBase {
     PoleL
   }
 
+  public enum Algae {
+    AlgaeAB,
+    AlgaeCD,
+    AlgaeEF,
+    AlgaeGH,
+    AlgaeIJ,
+    AlgaeKL
+  }
+
   public Pose2d getPoleLocation(Poles pole) {
     if (swerve.isRedAlliance()) {
       return redPoses.get(pole);
@@ -341,21 +366,45 @@ public class Vision extends SubsystemBase {
   private Pose2d closestPole = new Pose2d();
 
   private void calcClosestPole() {
-    // find closest pole
-    var poles = getPoles(swerve.isRedAlliance());
-    var closePole = Poles.PoleA;
-    var currentPose = swerve.getPose();
-    var closeDist = UtilFunctions.getDistance(currentPose, poles.get(closePole));
+    if (isCoralSupplier == null || isCoralSupplier.getAsBoolean()) {
+      // find closest pole
+      var poles = getPoles(swerve.isRedAlliance());
+      var closePole = Poles.PoleA;
+      var currentPose = swerve.getPose();
+      var closeDist = UtilFunctions.getDistance(currentPose, poles.get(closePole));
 
-    for (var key : poles.keySet()) {
-      var newDist = UtilFunctions.getDistance(currentPose, poles.get(key));
-      if (newDist < closeDist) {
-        closeDist = newDist;
-        closePole = key;
+      for (var key : poles.keySet()) {
+        var newDist = UtilFunctions.getDistance(currentPose, poles.get(key));
+        if (newDist < closeDist) {
+          closeDist = newDist;
+          closePole = key;
+        }
       }
-    }
 
-    closestPole = poles.get(closePole);
+      closestPole = poles.get(closePole);
+    } else {
+      // find closest algae
+      var closeAlgae = Algae.AlgaeAB;
+      var currentPose = swerve.getPose();
+      var finalPose = swerve.getPose();
+      var closeDist = 10000000000.;
+      var red = swerve.isRedAlliance();
+
+      for (var key : blueAlgae.keySet()) {
+        var algaePose = blueAlgae.get(key);
+        if (red) {
+          algaePose = flipFieldAlways(algaePose);
+        }
+        var newDist = UtilFunctions.getDistance(currentPose, algaePose);
+        if (newDist < closeDist) {
+          closeDist = newDist;
+          closeAlgae = key;
+          finalPose = algaePose;
+        }
+      }
+
+      closestPole = finalPose;
+    }
   }
 
   public Pose2d getClosestPole() {
