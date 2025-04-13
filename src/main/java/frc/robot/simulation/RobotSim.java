@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -133,8 +134,15 @@ public class RobotSim implements Runnable {
     coralPub.set(new Pose3d[] {coral});
 
     matter = new ArrayList<Matter>();
-    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 45));
-    matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 2));
+    if (DriverStation.isAutonomous()) {
+      // auto accelerations
+      matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 57));
+      matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 3));
+    } else {
+      // teleop accels
+      matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(3.5)), 45));
+      matter.add(new Matter(new Translation3d(0, 0, Units.inchesToMeters(heightSub.get())), 2));
+    }
   }
 
   /**

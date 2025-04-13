@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -51,6 +53,7 @@ import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.DistToTarget;
 import frc.robot.vision.Vision;
+import frc.robot.vision.Vision.Algae;
 import frc.robot.vision.Vision.Poles;
 import java.io.File;
 import java.util.Set;
@@ -200,6 +203,14 @@ public class RobotContainer {
         "LoadFromHP", new ConditionalCommand(LoadFromHp(), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("PushPartner", swerveDrive.pushPartner());
     NamedCommands.registerCommand("ElevatorL4Coral", setScoringPosition(ScoringPositions.L4Coral));
+    NamedCommands.registerCommand("ElevatorL2Algae", setScoringPosition(ScoringPositions.L2Algae));
+    NamedCommands.registerCommand("ElevatorL3Algae", setScoringPosition(ScoringPositions.L3Algae));
+    NamedCommands.registerCommand(
+        "ElevatorL1Algae", setScoringPosition(ScoringPositions.ProcessorAlgae));
+    NamedCommands.registerCommand(
+        "GrabAlgaeEF", GrabAlgaeFromReef(Algae.AlgaeEF, ScoringPositions.L3Algae));
+    NamedCommands.registerCommand(
+        "GrabAlgaeGH", GrabAlgaeFromReef(Algae.AlgaeGH, ScoringPositions.L2Algae));
     // disabling shake as it is too violent
     // NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
     // NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
@@ -209,6 +220,8 @@ public class RobotContainer {
         "ElevatorLoad", setScoringPosition(ScoringPositions.LoadingPosition));
     NamedCommands.registerCommand(
         "ScoreCoral", intake.driveIntakeFast(() -> true, pivot::getAngle).withTimeout(.5));
+    NamedCommands.registerCommand(
+        "ScoreAlgae", intake.driveIntake(() -> -1, () -> false).withTimeout(.5));
     NamedCommands.registerCommand(
         "HomeCoral",
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
@@ -227,6 +240,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("FineDriveJ", swerveDrive.alignToPoleDeferred(Poles.PoleJ));
     NamedCommands.registerCommand("FineDriveK", swerveDrive.alignToPoleDeferred(Poles.PoleK));
     NamedCommands.registerCommand("FineDriveL", swerveDrive.alignToPoleDeferred(Poles.PoleL));
+    NamedCommands.registerCommand(
+        "FineDriveProcess",
+        swerveDrive.alignToPoseAlliance(new Pose2d(6.118, 0.604, Rotation2d.fromDegrees(-90.))));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -244,6 +260,9 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Drive to Pose",
         new AlignToPose(swerveDrive, new Pose2d(2, 2, Rotation2d.fromDegrees(60))));
+    SmartDashboard.putData(
+        "Test Algae Grab", GrabAlgaeFromReef(Algae.AlgaeCD, ScoringPositions.L2Algae));
+    SmartDashboard.putData("Reset Center Auto", resetToH());
 
     // periodic tasks to add
     // turning off motor logging, we have hoot logs, and this is taking a lot of CPU time
@@ -422,5 +441,60 @@ public class RobotContainer {
 
   private Command LoadFromHp() {
     return intake.driveIntake(() -> 1, () -> true).until(intake::hasCoral);
+  }
+
+  public Command GrabAlgaeFromReef(Vision.Algae algae, ScoringPositions position) {
+
+    // switch to algae mode
+    // drive to position
+    // move elevator to position
+    // intake piece
+    // backup
+
+    // need to defer this so we can find the closest algae when this runs
+    return new DeferredCommand(
+        () -> {
+          // force us to algae before we calculate the positions
+          if (!pieceTypeSwitcher.isAlgae()) {
+            pieceTypeSwitcher.togglePieceSelected();
+          }
+
+          // lift angle
+          var liftAngle = pivot.getSetPosition(position) - 20;
+          SequentialCommandGroup group =
+              new SequentialCommandGroup(
+                  // move robot and get to elevator pose
+                  swerveDrive
+                      .alignToPose(vision.getAlgaeLocation(algae))
+                      .alongWith(setScoringPosition(position)),
+                  // setScoringPosition(position),
+                  // intake the game piece and drive closer
+                  intake
+                      .driveIntake(() -> 1, () -> false)
+                      .alongWith(swerveDrive.driveRobotOrient(new ChassisSpeeds(0.5, 0, 0)))
+                      .alongWith(pivot.setAngleCmd(liftAngle))
+                      // TODO replace with current draw
+                      .withTimeout(0.7),
+                  // lift the piece and get out
+                  swerveDrive
+                      .driveRobotOrient(new ChassisSpeeds(-0.5, 0, 0))
+                      .alongWith(intake.holdPiece())
+                      .withTimeout(0.5));
+
+          return group;
+        },
+        Set.of(swerveDrive, elevator, pivot, intake));
+  }
+
+  private Command resetToH() {
+    return new DeferredCommand(
+        () -> {
+          var startPos = vision.flipAlliance(new Pose2d(7.265, 4.157, Rotation2d.fromDegrees(180)));
+          return swerveDrive
+              .driveToPose(startPos)
+              .alongWith(setScoringPosition(ScoringPositions.LoadingPosition))
+              .alongWith(pieceTypeSwitcher.switchToCoral());
+        },
+        Set.of(swerveDrive, pivot, elevator));
   }
 }

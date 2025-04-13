@@ -331,6 +331,14 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  public Pose2d getAlgaeLocation(Algae algae) {
+    if (swerve.isRedAlliance()) {
+      return flipFieldAlways(blueAlgae.get(algae));
+    } else {
+      return blueAlgae.get(algae);
+    }
+  }
+
   public Pose2d flipAlliance(Pose2d poseToFlip) {
     if (swerve.isRedAlliance()) {
       return poseToFlip.relativeTo(
