@@ -63,9 +63,11 @@ public class DriverControls {
     int pov = driverLeft.getPOV();
     double request;
     if (pov == 0 || pov == 315 || pov == 45) {
+      // up goes down?
       request = 0.6;
     } else if (pov == 180 || pov == 225 || pov == 135) {
-      request = -0.6;
+      // down goes up
+      request = -0.8;
     } else {
       request = 0;
     }
