@@ -849,6 +849,10 @@ public class SwerveSubsystem extends SubsystemBase {
     return defer(() -> alignToPose(vision.flipAlliance(pose)));
   }
 
+  public Command alignToPoseAllianceFast(Pose2d pose) {
+    return defer(() -> alignToPoseFast(vision.flipAlliance(pose)));
+  }
+
   public Command alignToPoleDeferred(Vision.Poles pole) {
     return new DeferredCommand(
         () -> new AlignToPose(this, vision.getPoleLocation(pole)), Set.of(this));

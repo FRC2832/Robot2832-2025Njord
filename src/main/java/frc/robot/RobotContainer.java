@@ -207,10 +207,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL3Algae", setScoringPosition(ScoringPositions.L3Algae));
     NamedCommands.registerCommand(
         "ElevatorL1Algae", setScoringPosition(ScoringPositions.ProcessorAlgae));
+    NamedCommands.registerCommand("ElevatorL4Algae", setScoringPosition(ScoringPositions.NetAlgae));
     NamedCommands.registerCommand(
         "GrabAlgaeEF", GrabAlgaeFromReef(Algae.AlgaeEF, ScoringPositions.L3Algae));
     NamedCommands.registerCommand(
         "GrabAlgaeGH", GrabAlgaeFromReef(Algae.AlgaeGH, ScoringPositions.L2Algae));
+    NamedCommands.registerCommand(
+        "GrabAlgaeIJ", GrabAlgaeFromReef(Algae.AlgaeIJ, ScoringPositions.L3Algae));
     // disabling shake as it is too violent
     // NamedCommands.registerCommand("ShakeRobotLeft", swerveDrive.shakeRobot(true));
     // NamedCommands.registerCommand("ShakeRobotRight", swerveDrive.shakeRobot(false));
@@ -222,12 +225,15 @@ public class RobotContainer {
         "ScoreCoral", intake.driveIntakeFast(() -> true, pivot::getAngle).withTimeout(.5));
     NamedCommands.registerCommand(
         "ScoreAlgae", intake.driveIntake(() -> -1, () -> false).withTimeout(.5));
+    NamedCommands.registerCommand("ScoreAlgaeNet", scoreInNet());
     NamedCommands.registerCommand(
         "HomeCoral",
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("CoralMode", pieceTypeSwitcher.switchToCoral());
     NamedCommands.registerCommand("AlgaeMode", pieceTypeSwitcher.switchToAlgae());
     NamedCommands.registerCommand("StopPiece", intake.stopIntake());
+    NamedCommands.registerCommand("DisableTags", vision.diableAprilTags());
+    NamedCommands.registerCommand("EnableTags", vision.enableAprilTags());
 
     NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
     NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
@@ -243,7 +249,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("FineDriveL", swerveDrive.alignToPoleDeferred(Poles.PoleL));
     NamedCommands.registerCommand(
         "FineDriveProcess",
-        swerveDrive.alignToPoseAlliance(new Pose2d(6.118, 0.604, Rotation2d.fromDegrees(-90.))));
+        swerveDrive.alignToPoseAllianceFast(
+            new Pose2d(6.118, 0.604, Rotation2d.fromDegrees(-90.))));
+    NamedCommands.registerCommand(
+        "FineDriveNet",
+        swerveDrive.alignToPoseAllianceFast(new Pose2d(8.21, 4.81, Rotation2d.fromDegrees(180.))));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -496,5 +506,14 @@ public class RobotContainer {
               .alongWith(pieceTypeSwitcher.switchToCoral());
         },
         Set.of(swerveDrive, pivot, elevator));
+  }
+
+  private Command scoreInNet() {
+    return new SequentialCommandGroup(
+        pivot.setAngleCmd(10).until(() -> pivot.getAngle() < 90),
+        pivot
+            .setAngleCmd(10)
+            .alongWith(intake.driveIntake(() -> -1, () -> false))
+            .withTimeout(0.7));
   }
 }

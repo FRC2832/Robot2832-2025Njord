@@ -8,7 +8,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.swervedrive.SwerveSubsystem;
@@ -54,6 +56,7 @@ public class Vision extends SubsystemBase {
   private HashMap<Algae, Pose2d> blueAlgae = new HashMap<Vision.Algae, Pose2d>();
 
   private BooleanSupplier isCoralSupplier;
+  private boolean aprilTagAllowed;
 
   public Vision(SwerveSubsystem swerve) {
     // register this subsystem with the command scheduler to have the periodic function called
@@ -115,6 +118,7 @@ public class Vision extends SubsystemBase {
   }
 
   private void init() {
+    aprilTagAllowed = true;
     cameras = new ArrayList<>();
 
     if (Robot.isSimulation()) {
@@ -162,6 +166,10 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     calcClosestPole();
 
+    if (!DriverStation.isAutonomousEnabled()) {
+      aprilTagAllowed = true;
+    }
+
     if (SwerveDriveTelemetry.isSimulation && swerve.getSimulationDriveTrainPose().isPresent()) {
       /*
        * In the maple-sim, odometry is simulated using encoder values, accounting for factors like skidding and drifting.
@@ -172,12 +180,15 @@ public class Vision extends SubsystemBase {
        */
       visionSim.update(swerve.getSimulationDriveTrainPose().get());
     }
-    for (AprilTagCamera c : cameras) {
-      Optional<EstimatedRobotPose> poseEst = updateCamera(c);
-      if (poseEst.isPresent()) {
-        var pose = poseEst.get();
-        swerve.addVisionMeasurement(
-            pose.estimatedPose.toPose2d(), pose.timestampSeconds, c.curStdDevs);
+
+    if (aprilTagAllowed) {
+      for (AprilTagCamera c : cameras) {
+        Optional<EstimatedRobotPose> poseEst = updateCamera(c);
+        if (poseEst.isPresent()) {
+          var pose = poseEst.get();
+          swerve.addVisionMeasurement(
+              pose.estimatedPose.toPose2d(), pose.timestampSeconds, c.curStdDevs);
+        }
       }
     }
 
@@ -417,5 +428,19 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getClosestPole() {
     return closestPole;
+  }
+
+  public Command diableAprilTags() {
+    return runOnce(
+        () -> {
+          aprilTagAllowed = false;
+        });
+  }
+
+  public Command enableAprilTags() {
+    return runOnce(
+        () -> {
+          aprilTagAllowed = true;
+        });
   }
 }
