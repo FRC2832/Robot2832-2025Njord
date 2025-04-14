@@ -15,28 +15,28 @@
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "CenterToH"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "FineDriveH"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CenterToH"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "FineDriveH"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 8.0
+                  "name": "StopPiece"
                 }
               }
             ]
@@ -49,15 +49,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "H Drive Out"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ElevatorL2Algae"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "H Drive Out"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorL2Algae"
+                }
+              }
+            ]
           }
         },
         {

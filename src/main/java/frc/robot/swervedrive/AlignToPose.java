@@ -15,10 +15,16 @@ public class AlignToPose extends Command {
   private double lastHeading;
   private Pose2d target;
   private int counts;
+  private int maxCounts;
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose) {
+    this(swerve, pose, 10);
+  }
+
+  public AlignToPose(SwerveSubsystem swerve, Pose2d pose, int endCounts) {
     this.drive = swerve;
     this.target = pose;
+    this.maxCounts = endCounts;
     noSpeeds = new ChassisSpeeds();
 
     xController = new PIDController(3.1, 0.04, 0); // Vertical movement
@@ -78,7 +84,7 @@ public class AlignToPose extends Command {
 
   @Override
   public boolean isFinished() {
-    return counts >= 10;
+    return counts >= maxCounts;
   }
 
   @Override

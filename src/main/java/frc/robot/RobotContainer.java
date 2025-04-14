@@ -227,6 +227,7 @@ public class RobotContainer {
         new ConditionalCommand(intake.homeCoral(() -> 0), new WaitCommand(1), Robot::isReal));
     NamedCommands.registerCommand("CoralMode", pieceTypeSwitcher.switchToCoral());
     NamedCommands.registerCommand("AlgaeMode", pieceTypeSwitcher.switchToAlgae());
+    NamedCommands.registerCommand("StopPiece", intake.stopIntake());
 
     NamedCommands.registerCommand("FineDriveA", swerveDrive.alignToPoleDeferred(Poles.PoleA));
     NamedCommands.registerCommand("FineDriveB", swerveDrive.alignToPoleDeferred(Poles.PoleB));
@@ -465,9 +466,8 @@ public class RobotContainer {
               new SequentialCommandGroup(
                   // move robot and get to elevator pose
                   swerveDrive
-                      .alignToPose(vision.getAlgaeLocation(algae))
+                      .alignToPoseFast(vision.getAlgaeLocation(algae))
                       .alongWith(setScoringPosition(position)),
-                  // setScoringPosition(position),
                   // intake the game piece and drive closer
                   intake
                       .driveIntake(() -> 1, () -> false)
@@ -478,7 +478,7 @@ public class RobotContainer {
                   // lift the piece and get out
                   swerveDrive
                       .driveRobotOrient(new ChassisSpeeds(-0.5, 0, 0))
-                      .alongWith(intake.holdPiece())
+                      .alongWith(intake.driveIntake(() -> 1, () -> false))
                       .withTimeout(0.5));
 
           return group;

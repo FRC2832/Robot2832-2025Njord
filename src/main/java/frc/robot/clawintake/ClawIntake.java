@@ -83,4 +83,8 @@ public abstract class ClawIntake extends SubsystemBase {
   public Command holdPiece() {
     return new HoldPiece(this);
   }
+
+  public Command stopIntake() {
+    return runOnce(() -> setPower(0));
+  }
 }
