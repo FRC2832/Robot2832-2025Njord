@@ -207,7 +207,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("ElevatorL3Algae", setScoringPosition(ScoringPositions.L3Algae));
     NamedCommands.registerCommand(
         "ElevatorL1Algae", setScoringPosition(ScoringPositions.ProcessorAlgae));
-    NamedCommands.registerCommand("ElevatorL4Algae", setScoringPosition(ScoringPositions.NetAlgae));
+    NamedCommands.registerCommand(
+        "ElevatorL4Algae",
+        pivot.setAngleCmd(70).alongWith(elevator.setPositionCmd(ScoringPositions.NetAlgae)));
     NamedCommands.registerCommand(
         "GrabAlgaeEF", GrabAlgaeFromReef(Algae.AlgaeEF, ScoringPositions.L3Algae));
     NamedCommands.registerCommand(
@@ -250,10 +252,10 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "FineDriveProcess",
         swerveDrive.alignToPoseAllianceFast(
-            new Pose2d(6.118, 0.604, Rotation2d.fromDegrees(-90.))));
+            new Pose2d(6.118, 0.450, Rotation2d.fromDegrees(-90.))));
     NamedCommands.registerCommand(
         "FineDriveNet",
-        swerveDrive.alignToPoseAllianceFast(new Pose2d(8.21, 4.81, Rotation2d.fromDegrees(180.))));
+        swerveDrive.alignToPoseAllianceFast(new Pose2d(8.26, 4.81, Rotation2d.fromDegrees(180.))));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -471,25 +473,26 @@ public class RobotContainer {
           }
 
           // lift angle
-          var liftAngle = pivot.getSetPosition(position) - 20;
+          var targetIntakeAngle = pivot.getSetPosition(position);
+          var liftAngle = targetIntakeAngle - 20;
           SequentialCommandGroup group =
               new SequentialCommandGroup(
                   // move robot and get to elevator pose
                   swerveDrive
-                      .alignToPoseFast(vision.getAlgaeLocation(algae))
-                      .alongWith(setScoringPosition(position)),
+                      .alignToPose(vision.getAlgaeLocation(algae), 1, 4)
+                      .deadlineFor(setScoringPosition(position)),
                   // intake the game piece and drive closer
                   intake
                       .driveIntake(() -> 1, () -> false)
                       .alongWith(swerveDrive.driveRobotOrient(new ChassisSpeeds(0.5, 0, 0)))
                       .alongWith(pivot.setAngleCmd(liftAngle))
                       // TODO replace with current draw
-                      .withTimeout(0.7),
+                      .withTimeout(0.5),
                   // lift the piece and get out
                   swerveDrive
                       .driveRobotOrient(new ChassisSpeeds(-0.5, 0, 0))
                       .alongWith(intake.driveIntake(() -> 1, () -> false))
-                      .withTimeout(0.5));
+                      .withTimeout(0.2));
 
           return group;
         },

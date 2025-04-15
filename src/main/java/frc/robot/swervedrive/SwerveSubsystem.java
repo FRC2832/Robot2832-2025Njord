@@ -841,6 +841,10 @@ public class SwerveSubsystem extends SubsystemBase {
     return new AlignToPose(this, pose);
   }
 
+  public Command alignToPose(Pose2d pose, int endCounts, double errorDist) {
+    return new AlignToPose(this, pose, endCounts, errorDist);
+  }
+
   public Command alignToPoseFast(Pose2d pose) {
     return new AlignToPose(this, pose, 1);
   }

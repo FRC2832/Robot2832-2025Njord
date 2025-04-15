@@ -16,15 +16,21 @@ public class AlignToPose extends Command {
   private Pose2d target;
   private int counts;
   private int maxCounts;
+  private double maxErrorLimit;
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose) {
-    this(swerve, pose, 10);
+    this(swerve, pose, 10, 1.2);
   }
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose, int endCounts) {
+    this(swerve, pose, endCounts, 1.2);
+  }
+
+  public AlignToPose(SwerveSubsystem swerve, Pose2d pose, int endCounts, double errorDist) {
     this.drive = swerve;
     this.target = pose;
     this.maxCounts = endCounts;
+    this.maxErrorLimit = errorDist;
     noSpeeds = new ChassisSpeeds();
 
     xController = new PIDController(3.1, 0.04, 0); // Vertical movement
@@ -74,7 +80,7 @@ public class AlignToPose extends Command {
     // calculate if we are at goal
     // error was 0.8" X, 1.1" Y, or 1.36" total
     double distError = Math.sqrt((xError * xError) + (yError * yError));
-    if (Math.abs(rotError) < 2 && distError < 1.2) {
+    if (Math.abs(rotError) < 2 && distError < maxErrorLimit) {
       counts++;
     } else {
       // either decrement the count or make it zero
