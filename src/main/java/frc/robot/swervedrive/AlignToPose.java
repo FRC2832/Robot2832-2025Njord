@@ -11,19 +11,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class AlignToPose extends Command {
   private PIDController xController, yController, rotController;
   private SwerveSubsystem drive;
-  private boolean atSetpoint;
   private ChassisSpeeds noSpeeds;
   private double lastHeading;
   private Pose2d target;
   private int counts;
+  private int maxCounts;
+  private double maxErrorLimit;
 
   public AlignToPose(SwerveSubsystem swerve, Pose2d pose) {
+    this(swerve, pose, 10, 1.2);
+  }
+
+  public AlignToPose(SwerveSubsystem swerve, Pose2d pose, int endCounts) {
+    this(swerve, pose, endCounts, 1.2);
+  }
+
+  public AlignToPose(SwerveSubsystem swerve, Pose2d pose, int endCounts, double errorDist) {
     this.drive = swerve;
     this.target = pose;
+    this.maxCounts = endCounts;
+    this.maxErrorLimit = errorDist;
     noSpeeds = new ChassisSpeeds();
 
-    xController = new PIDController(3.1, 0.02, 0); // Vertical movement
-    yController = new PIDController(3.1, 0.02, 0); // Horitontal movement
+    xController = new PIDController(3.1, 0.04, 0); // Vertical movement
+    yController = new PIDController(3.1, 0.08, 0); // Horitontal movement
     rotController = new PIDController(0.05, 0.0004, 0); // Rotation
 
     rotController.setSetpoint(pose.getRotation().getDegrees());
@@ -39,15 +50,14 @@ public class AlignToPose extends Command {
 
   @Override
   public void initialize() {
-    atSetpoint = false;
     counts = 0;
   }
 
   @Override
   public void execute() {
     Pose2d pose = drive.getPose();
-    var xError = Units.inchesToMeters(pose.getX() - target.getX());
-    var yError = Units.inchesToMeters(pose.getY() - target.getY());
+    var xError = Units.metersToInches(pose.getX() - target.getX());
+    var yError = Units.metersToInches(pose.getY() - target.getY());
     var rotError = pose.getRotation().minus(target.getRotation()).getDegrees();
 
     double xSpeed = xController.calculate(pose.getX());
@@ -63,27 +73,24 @@ public class AlignToPose extends Command {
     double rotValue = rotController.calculate(centeredHeading);
     lastHeading = centeredHeading;
 
-    // handle field oriented
-    /*if (UtilFunctions.getAlliance() == Alliance.Red) {
-      xSpeed *= -1;
-      ySpeed *= -1;
-    }*/
+    // send the drive command
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rotValue);
+    drive.driveFieldOriented(speeds);
 
-    if (Math.abs(rotError) < 2 && Math.abs(xError) < 0.2 && Math.abs(yError) < 0.2) {
-      atSetpoint = true;
+    // calculate if we are at goal
+    // error was 0.8" X, 1.1" Y, or 1.36" total
+    double distError = Math.sqrt((xError * xError) + (yError * yError));
+    if (Math.abs(rotError) < 2 && distError < maxErrorLimit) {
       counts++;
     } else {
-      atSetpoint = false;
-      counts = 0;
+      // either decrement the count or make it zero
+      counts = Math.max(counts--, 0);
     }
-
-    drive.driveFieldOriented(speeds);
   }
 
   @Override
   public boolean isFinished() {
-    return counts >= 25;
+    return counts >= maxCounts;
   }
 
   @Override

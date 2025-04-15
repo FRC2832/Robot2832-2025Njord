@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // TODO fix status code checking
+// TODO Move status signals to a periodic function, using BaseStatusSignal.refreshAll();
 @SuppressWarnings("unused")
 public class TalonFXMotor extends MotorControl {
   final double SECONDS_BETWEEN_FAULT_READS = 2;

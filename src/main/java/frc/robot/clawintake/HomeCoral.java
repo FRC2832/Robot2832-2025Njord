@@ -48,7 +48,7 @@ public class HomeCoral extends Command {
     } else if (stage == Stages.DriveBack) {
       // overshoot a little for the PID to react
       intake.setPosition(startPos + 5);
-      if (intake.getPosition() > (startPos + 3)) {
+      if (intake.getPosition() > (startPos + 4)) {
         stage = Stages.Stop;
       }
     } else {

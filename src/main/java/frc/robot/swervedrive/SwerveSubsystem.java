@@ -841,6 +841,22 @@ public class SwerveSubsystem extends SubsystemBase {
     return new AlignToPose(this, pose);
   }
 
+  public Command alignToPose(Pose2d pose, int endCounts, double errorDist) {
+    return new AlignToPose(this, pose, endCounts, errorDist);
+  }
+
+  public Command alignToPoseFast(Pose2d pose) {
+    return new AlignToPose(this, pose, 1);
+  }
+
+  public Command alignToPoseAlliance(Pose2d pose) {
+    return defer(() -> alignToPose(vision.flipAlliance(pose)));
+  }
+
+  public Command alignToPoseAllianceFast(Pose2d pose) {
+    return defer(() -> alignToPoseFast(vision.flipAlliance(pose)));
+  }
+
   public Command alignToPoleDeferred(Vision.Poles pole) {
     return new DeferredCommand(
         () -> new AlignToPose(this, vision.getPoleLocation(pole)), Set.of(this));
@@ -860,5 +876,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private Command alignToClosePole(ILedSubsystem leds) {
     return alignToPose(vision.getClosestPole()).andThen(new LightningFlash(leds, Color.kPurple));
+  }
+
+  public Command driveRobotOrient(ChassisSpeeds speeds) {
+    return run(() -> drive(speeds));
   }
 }
